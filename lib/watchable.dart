@@ -86,8 +86,8 @@ class WatchableBuilder<T> extends StatelessWidget {
     Widget? child,
   }) =>
       WatchableBuilder<T>(
-        watchable:
-            _CombineLatestWatchable(watchableList, (values) => combiner(values)),
+        watchable: _CombineLatestWatchable(
+            watchableList, (values) => combiner(values)),
         builder: builder,
       );
 

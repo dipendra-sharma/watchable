@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:watchable/watchable.dart';
 
-
 void main() {
   group('Watchable', () {
     test('should initialize with the given value', () {
