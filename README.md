@@ -16,7 +16,7 @@ Add `watchable` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  watchable: ^1.0.0
+  watchable: any
 ```
 
 Then run `flutter pub get` to install the package.
