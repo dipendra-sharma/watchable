@@ -54,11 +54,55 @@ class _CombineLatestWatchable<T, R> extends Watchable<R> {
 typedef WatchableWidgetBuilder<T> = Widget Function(
     BuildContext context, T value, Widget? child);
 
+class _WatchableBuilderState<T> extends State<WatchableBuilder<T>> {
+  late T _value;
+
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.watchable.value;
+    widget.watchable.addListener(_handleValueChanged);
+  }
+
+  @override
+  void didUpdateWidget(WatchableBuilder<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.watchable != widget.watchable) {
+      oldWidget.watchable.removeListener(_handleValueChanged);
+      _value = widget.watchable.value;
+      widget.watchable.addListener(_handleValueChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.watchable.removeListener(_handleValueChanged);
+    super.dispose();
+  }
+
+  void _handleValueChanged() {
+    final newValue = widget.watchable.value;
+    if (widget.shouldRebuild?.call(_value, newValue) ?? _value != newValue) {
+      setState(() {
+        _value = newValue;
+      });
+    } else {
+      _value = newValue;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(context, _value, widget.child);
+  }
+}
+
 /// A widget that rebuilds when the value of a [Watchable] changes.
-class WatchableBuilder<T> extends StatelessWidget {
+class WatchableBuilder<T> extends StatefulWidget {
   final Watchable<T> watchable;
   final WatchableWidgetBuilder<T> builder;
   final Widget? child;
+  final bool Function(T previous, T current)? shouldRebuild;
 
   /// Creates a [WatchableBuilder] with the given [Watchable] and builder function.
   const WatchableBuilder({
@@ -66,16 +110,11 @@ class WatchableBuilder<T> extends StatelessWidget {
     required this.watchable,
     required this.builder,
     this.child,
+    this.shouldRebuild,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: watchable,
-      builder: (context, child) => builder(context, watchable.value, child),
-      child: child,
-    );
-  }
+  State<WatchableBuilder<T>> createState() => _WatchableBuilderState<T>();
 
   /// Creates a [WatchableBuilder] from a list of [Watchable] instances and a combiner function.
   static WatchableBuilder fromList<T>({
@@ -83,9 +122,11 @@ class WatchableBuilder<T> extends StatelessWidget {
     required List<Watchable<T>> watchableList,
     required T Function(List values) combiner,
     required WatchableWidgetBuilder<T> builder,
+    bool Function(T previous, T current)? shouldRebuild,
     Widget? child,
   }) =>
       WatchableBuilder<T>(
+        shouldRebuild: shouldRebuild,
         watchable: _CombineLatestWatchable(
             watchableList, (values) => combiner(values)),
         builder: builder,
@@ -98,9 +139,11 @@ class WatchableBuilder<T> extends StatelessWidget {
     required Watchable<B> watchable2,
     required T Function(A first, B second) combiner,
     required WatchableWidgetBuilder<T> builder,
+    bool Function(T previous, T current)? shouldRebuild,
     Widget? child,
   }) =>
       WatchableBuilder<T>(
+        shouldRebuild: shouldRebuild,
         watchable: _CombineLatestWatchable([watchable1, watchable2],
             (values) => combiner(values[0] as A, values[1] as B)),
         builder: builder,
@@ -114,9 +157,11 @@ class WatchableBuilder<T> extends StatelessWidget {
     required Watchable<C> watchable3,
     required T Function(A first, B second, C third) combiner,
     required WatchableWidgetBuilder<T> builder,
+    bool Function(T previous, T current)? shouldRebuild,
     Widget? child,
   }) =>
       WatchableBuilder<T>(
+        shouldRebuild: shouldRebuild,
         watchable: _CombineLatestWatchable(
             [watchable1, watchable2, watchable3],
             (values) =>
@@ -133,9 +178,11 @@ class WatchableBuilder<T> extends StatelessWidget {
     required Watchable<D> watchable4,
     required T Function(A first, B second, C third, D fourth) combiner,
     required WatchableWidgetBuilder<T> builder,
+    bool Function(T previous, T current)? shouldRebuild,
     Widget? child,
   }) =>
       WatchableBuilder<T>(
+        shouldRebuild: shouldRebuild,
         watchable: _CombineLatestWatchable(
             [watchable1, watchable2, watchable3, watchable4],
             (values) => combiner(values[0] as A, values[1] as B, values[2] as C,
@@ -153,9 +200,11 @@ class WatchableBuilder<T> extends StatelessWidget {
     required Watchable<E> watchable5,
     required T Function(A first, B second, C third, D fourth, E fifth) combiner,
     required WatchableWidgetBuilder<T> builder,
+    bool Function(T previous, T current)? shouldRebuild,
     Widget? child,
   }) =>
       WatchableBuilder<T>(
+        shouldRebuild: shouldRebuild,
         watchable: _CombineLatestWatchable(
             [watchable1, watchable2, watchable3, watchable4, watchable5],
             (values) => combiner(values[0] as A, values[1] as B, values[2] as C,
