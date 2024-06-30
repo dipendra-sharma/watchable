@@ -1,21 +1,35 @@
 library watchable;
 
 import 'package:flutter/widgets.dart';
+import 'package:collection/collection.dart';
 
 /// A class that holds a value of type [T] and notifies listeners when the value changes.
 class Watchable<T> extends ChangeNotifier {
   T _value;
   final T initial;
+  final bool Function(T old, T current)? compare;
 
   /// Creates a [Watchable] with an initial value.
-  Watchable(this.initial) : _value = initial;
+  Watchable(this.initial, {this.compare}) : _value = initial;
 
   /// Gets the current value.
   T get value => _value;
 
   /// Sets a new value and notifies listeners if the value has changed.
   set value(T newValue) {
-    if (newValue != _value) {
+    bool hasChanged = false;
+
+    if (compare != null) {
+      hasChanged = !compare!(_value, newValue);
+    } else if (T == List && _value is List && newValue is List) {
+      hasChanged = !const ListEquality().equals(_value as List, newValue);
+    } else if (T == Map && _value is Map && newValue is Map) {
+      hasChanged = !const MapEquality().equals(_value as Map, newValue);
+    } else {
+      hasChanged = newValue != _value;
+    }
+
+    if (hasChanged) {
       _value = newValue;
       notifyListeners();
     }
