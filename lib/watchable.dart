@@ -21,9 +21,9 @@ class Watchable<T> extends ChangeNotifier {
 
     if (compare != null) {
       hasChanged = !compare!(_value, newValue);
-    } else if (T == List && _value is List && newValue is List) {
+    } else if (_value is List && newValue is List) {
       hasChanged = !const ListEquality().equals(_value as List, newValue);
-    } else if (T == Map && _value is Map && newValue is Map) {
+    } else if (_value is Map && newValue is Map) {
       hasChanged = !const MapEquality().equals(_value as Map, newValue);
     } else {
       hasChanged = newValue != _value;

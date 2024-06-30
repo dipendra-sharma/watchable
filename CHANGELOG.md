@@ -2,6 +2,11 @@
 
 All notable changes to the `watchable` package will be documented in this file.
 
+## 1.0.5
+
+- Issues fixed with List, Map
+- Readme updated
+
 ## 1.0.4
 
 - Issues fixed with List, Map
