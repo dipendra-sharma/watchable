@@ -1,6 +1,6 @@
 name: watchable
 description: "A lightweight, intuitive state management solution for Flutter. Simplify your app's state with easy-to-use Watchable objects and efficient UI rebuilding"
-version: 2.0.1
+version: 2.0.2
 homepage: "https://github.com/dipendra-sharma/watchable"
 
 environment:

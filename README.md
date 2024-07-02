@@ -72,12 +72,12 @@ WatchableBuilder.from2<String, String, bool>(
 
 ### Handling Events
 
-Use `SharedWatchable` for event streams:
+Use `Watchable` for event streams:
 
 ```dart
-final notificationWatchable = SharedWatchable<String>();
+final notificationWatchable = Watchable<String>();
 
-SharedWatchableBuilder<String>(
+WatchableConsumer<String>(
   watchable: notificationWatchable,
   onEvent: (message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -135,7 +135,7 @@ For more complex state, you can create a custom state class:
 class AppState {
   final StateWatchable<User?> user = StateWatchable(null);
   final StateWatchable<List<Todo>> todos = StateWatchable([]);
-  final SharedWatchable<String> notifications = SharedWatchable();
+  final Watchable<String> notifications = Watchable();
 
   void login(User user) => this.user.emit(user);
   void logout() => this.user.emit(null);
