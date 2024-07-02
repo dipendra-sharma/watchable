@@ -2,6 +2,12 @@
 
 All notable changes to the `watchable` package will be documented in this file.
 
+## 2.0.0
+- `StateWatchable` class for mutable state management
+- `Watchable` class for event stream management
+- `WatchableBuilder` widget for efficient UI updates
+- `WatchableConsumer` widget for handling event streams
+
 ## 1.0.5
 
 - Issues fixed with List, Map
