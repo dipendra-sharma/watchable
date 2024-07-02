@@ -1,15 +1,13 @@
 # Watchable
 
-A lightweight, intuitive state management solution for Flutter applications. Watchable offers a
-simple API for wrapping values and efficiently rebuilding UI components when state changes.
+A lightweight, intuitive state management solution for Flutter applications. Watchable offers a simple API for managing state and efficiently rebuilding UI components when state changes.
 
 ## Features
 
-- `StateWatchable<T>` class for mutable state management with change notifications
-- `Watchable<T>` class for event stream management
-- `WatchableBuilder` widget for efficiently rebuilding UI when state changes
-- `WatchableConsumer` widget for handling event streams
-- Combine multiple `StateWatchable` instances with ease
+- Simple and intuitive API for state management
+- Efficient UI updates with fine-grained control
+- Support for both mutable state and event streams
+- Easy combination of multiple state objects
 - Minimal boilerplate code
 - Scalable from simple to complex state management scenarios
 
@@ -26,113 +24,139 @@ Then run `flutter pub get` to install the package.
 
 ## Usage
 
-Here's a simple example of how to use `StateWatchable` and `WatchableBuilder`:
+### Basic State Management
+
+Use `StateWatchable` for managing mutable state:
 
 ```dart
-import 'package:flutter/material.dart';
-import 'package:watchable/watchable.dart';
+final counterWatchable = StateWatchable<int>(0);
 
-void main() {
-  runApp(MyApp());
-}
+WatchableBuilder<int>(
+  watchable: counterWatchable,
+  builder: (context, value, child) {
+    return Text('Counter: $value');
+  },
+)
 
-class MyApp extends StatelessWidget {
-  final counterWatchable = StateWatchable<int>(0);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: Text('Watchable Example')),
-        body: Center(
-          child: WatchableBuilder<int>(
-            watchable: counterWatchable,
-            builder: (context, value, child) {
-              return Text('Counter: $value');
-            },
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => counterWatchable.emit(counterWatchable.value + 1),
-          child: Icon(Icons.add),
-        ),
-      ),
-    );
-  }
-}
+// Update the state
+counterWatchable.emit(counterWatchable.value + 1);
 ```
 
-## API Reference
+### Form Handling
 
-### StateWatchable<T>
+Manage form state easily:
 
-A class that holds a mutable value of type `T` and notifies listeners when the value changes.
+```dart
+final nameWatchable = StateWatchable<String>('');
+final emailWatchable = StateWatchable<String>('');
 
-#### Constructor
+TextField(
+  onChanged: (value) => nameWatchable.emit(value),
+),
+TextField(
+  onChanged: (value) => emailWatchable.emit(value),
+),
 
-- `StateWatchable(T initial, {bool Function(T old, T current)? compare})`: Creates
-  a `StateWatchable` with an initial value and an optional comparison function.
+WatchableBuilder.from2<String, String, bool>(
+  watchable1: nameWatchable,
+  watchable2: emailWatchable,
+  combiner: (name, email) => name.isNotEmpty && email.isNotEmpty,
+  builder: (context, isValid, child) {
+    return ElevatedButton(
+      onPressed: isValid ? () => submitForm() : null,
+      child: Text('Submit'),
+    );
+  },
+)
+```
 
-#### Properties
+### Handling Events
 
-- `T value`: Gets the current value.
+Use `SharedWatchable` for event streams:
 
-#### Methods
+```dart
+final notificationWatchable = SharedWatchable<String>();
 
-- `void emit(T value)`: Sets a new value and notifies listeners if the value has changed.
+SharedWatchableBuilder<String>(
+  watchable: notificationWatchable,
+  onEvent: (message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  },
+  child: YourWidget(),
+)
 
-### Watchable<T>
+// Trigger an event
+notificationWatchable.emit('New notification!');
+```
 
-A class that represents an event stream of type `T`.
+### Combining Multiple States
 
-#### Constructor
+Easily combine multiple state objects:
 
-- `Watchable({int replay = 0})`: Creates a `Watchable` with an optional replay cache size.
+```dart
+final userWatchable = StateWatchable<User?>(null);
+final postsWatchable = StateWatchable<List<Post>>([]);
 
-#### Methods
+WatchableBuilder.from2<User?, List<Post>, Widget>(
+  watchable1: userWatchable,
+  watchable2: postsWatchable,
+  combiner: (user, posts) {
+    if (user == null) return LoginScreen();
+    return PostList(user: user, posts: posts);
+  },
+  builder: (context, widget, child) => widget,
+)
+```
 
-- `void emit(T value)`: Emits a new value to all subscribers.
-- `void watch(Function(T) watcher)`: Adds a subscriber to the watchable.
-- `void unwatch(Function(T) watcher)`: Removes a subscriber from the watchable.
+### Optimizing Rebuilds
 
-### WatchableBuilder<T>
+Use `shouldRebuild` to control when the UI updates:
 
-A widget that rebuilds when the value of a `StateWatchable` changes.
+```dart
+WatchableBuilder<List<Item>>(
+  watchable: itemsWatchable,
+  shouldRebuild: (previous, current) => previous.length != current.length,
+  builder: (context, items, child) {
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) => ItemTile(item: items[index]),
+    );
+  },
+)
+```
 
-#### Constructor
+### Managing Complex State
 
-- `WatchableBuilder({required StateWatchable<T> watchable, required Widget Function(BuildContext, T, Widget?) builder, bool Function(T previous, T current)? shouldRebuild, Widget? child})`:
-  Creates a `WatchableBuilder` with the given `StateWatchable` and builder function.
+For more complex state, you can create a custom state class:
 
-#### Static Methods
+```dart
+class AppState {
+  final StateWatchable<User?> user = StateWatchable(null);
+  final StateWatchable<List<Todo>> todos = StateWatchable([]);
+  final SharedWatchable<String> notifications = SharedWatchable();
 
-- `WatchableBuilder<T> fromList<T>({required List<StateWatchable<T>> watchableList, required T Function(List values) combiner, required Widget Function(BuildContext, T, Widget?) builder, bool Function(T previous, T current)? shouldRebuild, Widget? child})`:
-  Creates a `WatchableBuilder` from a list of `StateWatchable` instances and a combiner function.
+  void login(User user) => this.user.emit(user);
+  void logout() => this.user.emit(null);
+  void addTodo(Todo todo) => todos.emit([...todos.value, todo]);
+  void notify(String message) => notifications.emit(message);
+}
 
-- `WatchableBuilder<T> from2<A, B, T>({required StateWatchable<A> watchable1, required StateWatchable<B> watchable2, required T Function(A first, B second) combiner, required Widget Function(BuildContext, T, Widget?) builder, bool Function(T previous, T current)? shouldRebuild, Widget? child})`:
-  Creates a `WatchableBuilder` from two `StateWatchable` instances and a combiner function.
+final appState = AppState();
 
-- Similar methods exist for `from3`, `from4`, and `from5`, combining 3, 4, and 5 `StateWatchable`
-  instances respectively.
-
-### WatchableConsumer<T>
-
-A widget that handles events from a `Watchable`.
-
-#### Constructor
-
-- `WatchableConsumer({required Watchable<T> watchable, required void Function(T value) onEvent, required Widget child})`:
-  Creates a `WatchableConsumer` with the given `Watchable`, event handler, and child widget.
-
-## Examples
-
-For more advanced usage and examples, check out the [example](example) folder in the package
-repository.
+// Usage
+WatchableBuilder<User?>(
+  watchable: appState.user,
+  builder: (context, user, child) {
+    return user != null ? HomeScreen() : LoginScreen();
+  },
+)
+```
 
 ## Additional Information
 
-For more information on using this package, please refer to
-the [API documentation](https://pub.dev/documentation/watchable/latest/).
+For more detailed API information and advanced usage, please refer to the [API documentation](https://pub.dev/documentation/watchable/latest/).
 
 ## Contributing
 
@@ -140,5 +164,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the BSD-3-Clause License - see the [LICENSE](LICENSE) file for
-details.
+This project is licensed under the BSD-3-Clause License - see the [LICENSE](LICENSE) file for details.
