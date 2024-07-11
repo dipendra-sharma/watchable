@@ -75,7 +75,7 @@ WatchableBuilder.from2<String, String, bool>(
 Use `Watchable` for event streams:
 
 ```dart
-final notificationWatchable = Watchable<String>();
+final notificationWatchable = MutableWatchable<String>();
 
 WatchableConsumer<String>(
   watchable: notificationWatchable,
@@ -137,7 +137,7 @@ class AppState {
   StateWatchable<User?> get user => _user;
   final _todos = MutableStateWatchable([]);
   StateWatchable<List<Todo>> get todos => _todos;
-  final _notifications = Watchable();
+  final _notifications = MutableWatchable();
   Watchable<String> get notifications => _notifications;
 
   void login(User user) => _user.emit(user);
