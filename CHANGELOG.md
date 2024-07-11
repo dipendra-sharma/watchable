@@ -2,6 +2,11 @@
 
 All notable changes to the `watchable` package will be documented in this file.
 
+## 2.0.4
+- For controlled access to its state mutability added
+- `MutableStateWatchable` added
+- `MutableWatchable` added
+
 ## 2.0.3
 - Example updated
 

@@ -4,9 +4,9 @@ import 'package:watchable/watchable.dart';
 // Update with the correct path
 
 void main() {
-  group('Watchable', () {
+  group('MutableWatchable', () {
     test('emit value to subscribers', () {
-      final shared = Watchable<int>();
+      final shared = MutableWatchable<int>();
       bool valueReceived = false;
       shared.watch((value) {
         if (value == 1) {
@@ -18,21 +18,21 @@ void main() {
     });
 
     test('replay cache works correctly', () {
-      final shared = Watchable<int>(replay: 2);
+      final shared = MutableWatchable<int>(replay: 2);
       shared.emit(1);
       shared.emit(2);
       expect(shared.replayCache, [1, 2]);
     });
 
     test('replay cache respects buffer size', () {
-      final shared = Watchable<int>(replay: 1);
+      final shared = MutableWatchable<int>(replay: 1);
       shared.emit(1);
       shared.emit(2);
       expect(shared.replayCache, [2]);
     });
 
     test('new subscriber receives replayed values', () {
-      final shared = Watchable<int>(replay: 2);
+      final shared = MutableWatchable<int>(replay: 2);
       shared.emit(1);
       shared.emit(2);
       List<int> receivedValues = [];
@@ -43,7 +43,7 @@ void main() {
     });
 
     test('unwatch removes subscriber', () {
-      final shared = Watchable<int>();
+      final shared = MutableWatchable<int>();
       void watcher(int value) {}
       shared.watch(watcher);
       shared.unwatch(watcher);
@@ -51,7 +51,7 @@ void main() {
     });
 
     test('dispose clears subscribers and replay cache', () {
-      final shared = Watchable<int>(replay: 2);
+      final shared = MutableWatchable<int>(replay: 2);
       shared.emit(1);
       shared.dispose();
       expect(shared.watchers.isEmpty, true);
@@ -59,15 +59,15 @@ void main() {
     });
   });
 
-  group('StateWatchable', () {
+  group('MutableStateWatchable', () {
     test('initial value is emitted', () {
-      final watchable = StateWatchable<int>(0);
+      final watchable = MutableStateWatchable<int>(0);
       expect(watchable.value, 0);
     });
 
     test('value does not change if compare function returns false', () {
-      final watchable =
-          StateWatchable<int>(0, compare: (old, current) => old == current);
+      final watchable = MutableStateWatchable<int>(0,
+          compare: (old, current) => old == current);
       bool valueChanged = false;
       watchable.watch((value) {
         if (value == 1) {
@@ -79,7 +79,7 @@ void main() {
     });
 
     test('list equality comparison', () {
-      final watchable = StateWatchable<List<int>>([1, 2, 3]);
+      final watchable = MutableStateWatchable<List<int>>([1, 2, 3]);
       bool valueChanged = false;
       watchable.watch((value) {
         if (value == [1, 2, 3]) {
@@ -91,7 +91,7 @@ void main() {
     });
 
     test('map equality comparison', () {
-      final watchable = StateWatchable<Map<String, int>>({'a': 1});
+      final watchable = MutableStateWatchable<Map<String, int>>({'a': 1});
       bool valueChanged = false;
       watchable.watch((value) {
         if (value == {'a': 1}) {
@@ -103,7 +103,7 @@ void main() {
     });
 
     test('dispose clears subscribers and replay cache', () {
-      final watchable = StateWatchable<int>(0);
+      final watchable = MutableStateWatchable<int>(0);
       watchable.dispose();
       expect(watchable.replayCache.isEmpty, true);
     });
@@ -111,8 +111,8 @@ void main() {
 
   group('CombineLatestWatchable', () {
     test('combines initial values correctly', () {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
       final combined = CombineLatestWatchable<int, int>(
         [watchable1, watchable2],
         (values) => values.reduce((a, b) => a + b),
@@ -121,8 +121,8 @@ void main() {
     });
 
     test('updates combined value when one of the sources changes', () {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
       final combined = CombineLatestWatchable<int, int>(
         [watchable1, watchable2],
         (values) => values.reduce((a, b) => a + b),
@@ -138,8 +138,8 @@ void main() {
     });
 
     test('dispose unwatch all sources', () {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
       final combined = CombineLatestWatchable<int, int>(
         [watchable1, watchable2],
         (values) => values.reduce((a, b) => a + b),
@@ -152,7 +152,7 @@ void main() {
 
   group('WatchableBuilder', () {
     testWidgets('builds with initial value', (WidgetTester tester) async {
-      final watchable = StateWatchable<int>(0);
+      final watchable = MutableStateWatchable<int>(0);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -168,7 +168,7 @@ void main() {
     });
 
     testWidgets('rebuilds when value changes', (WidgetTester tester) async {
-      final watchable = StateWatchable<int>(0);
+      final watchable = MutableStateWatchable<int>(0);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -187,7 +187,7 @@ void main() {
 
     testWidgets('does not rebuild if shouldRebuild returns false',
         (WidgetTester tester) async {
-      final watchable = StateWatchable<int>(0);
+      final watchable = MutableStateWatchable<int>(0);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -207,8 +207,8 @@ void main() {
 
     testWidgets('updates widget when watchable changes',
         (WidgetTester tester) async {
-      final watchable1 = StateWatchable<int>(0);
-      final watchable2 = StateWatchable<int>(1);
+      final watchable1 = MutableStateWatchable<int>(0);
+      final watchable2 = MutableStateWatchable<int>(1);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -238,8 +238,8 @@ void main() {
   group('WatchableBuilder.fromList', () {
     testWidgets('combines initial values correctly',
         (WidgetTester tester) async {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -257,8 +257,8 @@ void main() {
 
     testWidgets('updates combined value when one of the sources changes',
         (WidgetTester tester) async {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -280,8 +280,8 @@ void main() {
   group('WatchableBuilder.from2', () {
     testWidgets('combines initial values correctly',
         (WidgetTester tester) async {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -300,8 +300,8 @@ void main() {
 
     testWidgets('updates combined value when one of the sources changes',
         (WidgetTester tester) async {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -324,9 +324,9 @@ void main() {
   group('WatchableBuilder.from3', () {
     testWidgets('combines initial values correctly',
         (WidgetTester tester) async {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
-      final watchable3 = StateWatchable<int>(3);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
+      final watchable3 = MutableStateWatchable<int>(3);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -346,9 +346,9 @@ void main() {
 
     testWidgets('updates combined value when one of the sources changes',
         (WidgetTester tester) async {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
-      final watchable3 = StateWatchable<int>(3);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
+      final watchable3 = MutableStateWatchable<int>(3);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -372,10 +372,10 @@ void main() {
   group('WatchableBuilder.from4', () {
     testWidgets('combines initial values correctly',
         (WidgetTester tester) async {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
-      final watchable3 = StateWatchable<int>(3);
-      final watchable4 = StateWatchable<int>(4);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
+      final watchable3 = MutableStateWatchable<int>(3);
+      final watchable4 = MutableStateWatchable<int>(4);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -397,10 +397,10 @@ void main() {
 
     testWidgets('updates combined value when one of the sources changes',
         (WidgetTester tester) async {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
-      final watchable3 = StateWatchable<int>(3);
-      final watchable4 = StateWatchable<int>(4);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
+      final watchable3 = MutableStateWatchable<int>(3);
+      final watchable4 = MutableStateWatchable<int>(4);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -426,11 +426,11 @@ void main() {
   group('WatchableBuilder.from5', () {
     testWidgets('combines initial values correctly',
         (WidgetTester tester) async {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
-      final watchable3 = StateWatchable<int>(3);
-      final watchable4 = StateWatchable<int>(4);
-      final watchable5 = StateWatchable<int>(5);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
+      final watchable3 = MutableStateWatchable<int>(3);
+      final watchable4 = MutableStateWatchable<int>(4);
+      final watchable5 = MutableStateWatchable<int>(5);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -455,11 +455,11 @@ void main() {
 
     testWidgets('updates combined value when one of the sources changes',
         (WidgetTester tester) async {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
-      final watchable3 = StateWatchable<int>(3);
-      final watchable4 = StateWatchable<int>(4);
-      final watchable5 = StateWatchable<int>(5);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
+      final watchable3 = MutableStateWatchable<int>(3);
+      final watchable4 = MutableStateWatchable<int>(4);
+      final watchable5 = MutableStateWatchable<int>(5);
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -484,11 +484,11 @@ void main() {
   });
 
   group('WatchableBuilder Dispose Tests', () {
-    late StateWatchable<int> watchable;
+    late MutableStateWatchable<int> watchable;
     late Widget testWidget;
 
     setUp(() {
-      watchable = StateWatchable<int>(0);
+      watchable = MutableStateWatchable<int>(0);
       testWidget = Directionality(
         textDirection: TextDirection.ltr,
         child: WatchableBuilder<int>(
@@ -527,7 +527,7 @@ void main() {
 
     testWidgets('WatchableBuilder does not call unwatch if not watched',
         (WidgetTester tester) async {
-      final anotherWatchable = StateWatchable<int>(0);
+      final anotherWatchable = MutableStateWatchable<int>(0);
       bool unwatchCalled = false;
 
       anotherWatchable.watch((value) {
@@ -557,13 +557,13 @@ void main() {
   });
 
   group('WatchableBuilder from Constructors Dispose Tests', () {
-    late StateWatchable<int> watchable1;
-    late StateWatchable<int> watchable2;
+    late MutableStateWatchable<int> watchable1;
+    late MutableStateWatchable<int> watchable2;
     late Widget testWidget;
 
     setUp(() {
-      watchable1 = StateWatchable<int>(0);
-      watchable2 = StateWatchable<int>(0);
+      watchable1 = MutableStateWatchable<int>(0);
+      watchable2 = MutableStateWatchable<int>(0);
       testWidget = Directionality(
         textDirection: TextDirection.ltr,
         child: WatchableBuilder.from2(
@@ -645,11 +645,11 @@ void main() {
   });
 
   group('WatchableConsumer Tests', () {
-    late Watchable<int> watchable;
+    late MutableWatchable<int> watchable;
     late int callbackValue;
 
     setUp(() {
-      watchable = Watchable<int>();
+      watchable = MutableWatchable<int>();
       callbackValue = -1;
     });
 
@@ -750,39 +750,39 @@ void main() {
     });
   });
 
-  group('Watchable Negative Tests', () {
+  group('MutableWatchable Negative Tests', () {
     test('emit value without subscribers', () {
-      final shared = Watchable<int>();
+      final shared = MutableWatchable<int>();
       expect(() => shared.emit(1), returnsNormally);
     });
 
     test('unwatch non-existent subscriber', () {
-      final shared = Watchable<int>();
+      final shared = MutableWatchable<int>();
       void watcher(int value) {}
       expect(() => shared.unwatch(watcher), returnsNormally);
     });
 
     test('dispose already disposed watchable', () {
-      final shared = Watchable<int>();
+      final shared = MutableWatchable<int>();
       shared.dispose();
       expect(() => shared.dispose(), returnsNormally);
     });
   });
 
-  group('StateWatchable Negative Tests', () {
+  group('MutableStateWatchable Negative Tests', () {
     test('emit value without subscribers', () {
-      final watchable = StateWatchable<int>(0);
+      final watchable = MutableStateWatchable<int>(0);
       expect(() => watchable.emit(1), returnsNormally);
     });
 
     test('unwatch non-existent subscriber', () {
-      final watchable = StateWatchable<int>(0);
+      final watchable = MutableStateWatchable<int>(0);
       void watcher(int value) {}
       expect(() => watchable.unwatch(watcher), returnsNormally);
     });
 
     test('dispose already disposed watchable', () {
-      final watchable = StateWatchable<int>(0);
+      final watchable = MutableStateWatchable<int>(0);
       watchable.dispose();
       expect(() => watchable.dispose(), returnsNormally);
     });
@@ -798,8 +798,8 @@ void main() {
     });
 
     test('emit value without subscribers', () {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
       final combined = CombineLatestWatchable<int, int>(
         [watchable1, watchable2],
         (values) => values.reduce((a, b) => a + b),
@@ -808,8 +808,8 @@ void main() {
     });
 
     test('unwatch non-existent subscriber', () {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
       final combined = CombineLatestWatchable<int, int>(
         [watchable1, watchable2],
         (values) => values.reduce((a, b) => a + b),
@@ -819,8 +819,8 @@ void main() {
     });
 
     test('dispose already disposed watchable', () {
-      final watchable1 = StateWatchable<int>(1);
-      final watchable2 = StateWatchable<int>(2);
+      final watchable1 = MutableStateWatchable<int>(1);
+      final watchable2 = MutableStateWatchable<int>(2);
       final combined = CombineLatestWatchable<int, int>(
         [watchable1, watchable2],
         (values) => values.reduce((a, b) => a + b),
@@ -831,10 +831,10 @@ void main() {
   });
 
   group('WatchableConsumer Negative Tests', () {
-    late Watchable<int> watchable;
+    late MutableWatchable<int> watchable;
 
     setUp(() {
-      watchable = Watchable<int>();
+      watchable = MutableWatchable<int>();
     });
 
     testWidgets('should handle dispose already disposed widget gracefully',
@@ -862,7 +862,7 @@ void main() {
   group('WatchableBuilder Negative Tests', () {
     testWidgets('should handle dispose already disposed widget gracefully',
         (WidgetTester tester) async {
-      final watchable = StateWatchable<int>(0);
+      final watchable = MutableStateWatchable<int>(0);
 
       await tester.pumpWidget(
         Directionality(
@@ -886,7 +886,7 @@ void main() {
 
     testWidgets('should handle unwatch non-existent subscriber gracefully',
         (WidgetTester tester) async {
-      final watchable = StateWatchable<int>(0);
+      final watchable = MutableStateWatchable<int>(0);
 
       await tester.pumpWidget(
         Directionality(
@@ -910,11 +910,11 @@ void main() {
   });
 
   group('WatchableBuilder Dispose Negative Tests', () {
-    late StateWatchable<int> watchable;
+    late MutableStateWatchable<int> watchable;
     late Widget testWidget;
 
     setUp(() {
-      watchable = StateWatchable<int>(0);
+      watchable = MutableStateWatchable<int>(0);
       testWidget = Directionality(
         textDirection: TextDirection.ltr,
         child: WatchableBuilder<int>(
@@ -953,7 +953,7 @@ void main() {
 
     testWidgets('WatchableBuilder does not call unwatch if not watched',
         (WidgetTester tester) async {
-      final anotherWatchable = StateWatchable<int>(0);
+      final anotherWatchable = MutableStateWatchable<int>(0);
       bool unwatchCalled = false;
 
       anotherWatchable.watch((value) {
@@ -983,13 +983,13 @@ void main() {
   });
 
   group('WatchableBuilder from Constructors Dispose Negative Tests', () {
-    late StateWatchable<int> watchable1;
-    late StateWatchable<int> watchable2;
+    late MutableStateWatchable<int> watchable1;
+    late MutableStateWatchable<int> watchable2;
     late Widget testWidget;
 
     setUp(() {
-      watchable1 = StateWatchable<int>(0);
-      watchable2 = StateWatchable<int>(0);
+      watchable1 = MutableStateWatchable<int>(0);
+      watchable2 = MutableStateWatchable<int>(0);
       testWidget = Directionality(
         textDirection: TextDirection.ltr,
         child: WatchableBuilder.from2(
@@ -1072,7 +1072,7 @@ void main() {
 
   group('Stability Tests', () {
     test('handles high load of emissions', () {
-      final shared = Watchable<int>();
+      final shared = MutableWatchable<int>();
       int receivedCount = 0;
       shared.watch((value) {
         receivedCount++;
@@ -1086,7 +1086,7 @@ void main() {
     });
 
     test('handles null emission gracefully', () {
-      final shared = Watchable<int?>();
+      final shared = MutableWatchable<int?>();
       bool nullReceived = false;
       shared.watch((value) {
         if (value == null) {
@@ -1099,7 +1099,7 @@ void main() {
     });
 
     test('manages resources correctly after multiple subscriptions', () {
-      final shared = Watchable<int>();
+      final shared = MutableWatchable<int>();
       void watcher(int value) {}
 
       for (int i = 0; i < 100; i++) {
@@ -1111,7 +1111,7 @@ void main() {
     });
 
     test('handles concurrent emissions', () async {
-      final shared = Watchable<int>();
+      final shared = MutableWatchable<int>();
       int receivedCount = 0;
       shared.watch((value) {
         receivedCount++;
@@ -1127,13 +1127,13 @@ void main() {
     });
 
     test('handles multiple dispose calls gracefully', () {
-      final shared = Watchable<int>();
+      final shared = MutableWatchable<int>();
       shared.dispose();
       expect(() => shared.dispose(), returnsNormally);
     });
 
     test('handles unwatch non-existent subscriber gracefully', () {
-      final shared = Watchable<int>();
+      final shared = MutableWatchable<int>();
       void watcher(int value) {}
       expect(() => shared.unwatch(watcher), returnsNormally);
     });

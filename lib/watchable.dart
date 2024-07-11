@@ -6,10 +6,14 @@ import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 
 /// A class that combines multiple StateWatchable instances and emits a combined value.
-class CombineLatestWatchable<T, R> extends StateWatchable<R> {
+class CombineLatestWatchable<T, R> extends MutableStateWatchable<R> {
   /// List of functions to unwatch the watchables.
   final List<Function> _unwatchFunctions = [];
 
+  /// Creates a CombineLatestWatchable instance.
+  ///
+  /// [watchableList] is the list of StateWatchable instances to combine.
+  /// [combiner] is the function that combines the values from the watchableList.
   CombineLatestWatchable(
     Iterable<StateWatchable<T>> watchableList,
     R Function(List<T> values) combiner,
@@ -219,7 +223,22 @@ class WatchableBuilder<T> extends StatefulWidget {
 }
 
 /// A class that allows watching and emitting values.
-class Watchable<T> {
+abstract class Watchable<T> {
+  /// Adds a watcher function.
+  void watch(Function(T) watcher);
+
+  /// Removes a watcher function.
+  void unwatch(Function(T) watcher);
+
+  /// Gets the replay cache as an unmodifiable list.
+  List<T> get replayCache;
+
+  /// Disposes the watchable by clearing watchers and replay cache.
+  void dispose();
+}
+
+/// A class that allows watching and emitting values.
+class MutableWatchable<T> implements Watchable<T> {
   /// List of watcher functions.
   final List<Function(T)> watchers = [];
 
@@ -229,7 +248,8 @@ class Watchable<T> {
   /// Queue to store the replay cache.
   final Queue<T> _replayCache;
 
-  Watchable({int replay = 0})
+  /// Creates a MutableWatchable instance with an optional replay buffer size.
+  MutableWatchable({int replay = 0})
       : _bufferSize = replay,
         _replayCache = Queue<T>();
 
@@ -247,6 +267,7 @@ class Watchable<T> {
   }
 
   /// Adds a watcher function.
+  @override
   void watch(Function(T) watcher) {
     watchers.add(watcher);
     if (_bufferSize > 0) {
@@ -257,14 +278,17 @@ class Watchable<T> {
   }
 
   /// Removes a watcher function.
+  @override
   void unwatch(Function(T) watcher) {
     watchers.remove(watcher);
   }
 
   /// Gets the replay cache as an unmodifiable list.
+  @override
   List<T> get replayCache => List.unmodifiable(_replayCache);
 
   /// Disposes the watchable by clearing watchers and replay cache.
+  @override
   void dispose() {
     watchers.clear();
     _replayCache.clear();
@@ -272,20 +296,28 @@ class Watchable<T> {
 }
 
 /// A class that extends Watchable to maintain a stateful value.
-class StateWatchable<T> extends Watchable<T> {
+abstract class StateWatchable<T> extends Watchable<T> {
+  T get value;
+}
+
+/// A class that extends Watchable to maintain a stateful value.
+class MutableStateWatchable<T> extends MutableWatchable<T>
+    implements StateWatchable<T> {
   /// Current value of the watchable.
   T _value;
 
   /// Optional comparison function to determine value changes.
   final bool Function(T old, T current)? compare;
 
-  StateWatchable(T initial, {this.compare})
+  /// Creates a MutableStateWatchable instance with an initial value and an optional comparison function.
+  MutableStateWatchable(T initial, {this.compare})
       : _value = initial,
         super(replay: 1) {
     emit(initial); // Ensure the initial value is in the replay cache
   }
 
   /// Gets the current value.
+  @override
   T get value => _value;
 
   @override

@@ -8,9 +8,15 @@ void main() {
 }
 
 class MainPage extends StatelessWidget {
-  final counterWatchable = StateWatchable<int>(0);
-  final textWatchable = StateWatchable<String>('');
-  final eventWatchable = Watchable<String>();
+  final _counterWatchable = MutableStateWatchable<int>(0);
+
+  StateWatchable<int> get counterWatchable => _counterWatchable;
+  final _textWatchable = MutableStateWatchable<String>('');
+
+  StateWatchable<String> get textWatchable => _textWatchable;
+  final _eventWatchable = MutableWatchable<String>();
+
+  Watchable<String> get eventWatchable => _eventWatchable;
 
   MainPage({super.key});
 
@@ -29,7 +35,7 @@ class MainPage extends StatelessWidget {
             },
           ),
           ElevatedButton(
-            onPressed: () => counterWatchable.emit(counterWatchable.value + 1),
+            onPressed: () => _counterWatchable.emit(counterWatchable.value + 1),
             child: const Text('Increment'),
           ),
           const SizedBox(height: 20),
@@ -40,7 +46,7 @@ class MainPage extends StatelessWidget {
             },
           ),
           TextField(
-            onChanged: (value) => textWatchable.emit(value),
+            onChanged: (value) => _textWatchable.emit(value),
             decoration: const InputDecoration(labelText: 'Enter text'),
           ),
           const SizedBox(height: 20),
@@ -52,7 +58,7 @@ class MainPage extends StatelessWidget {
               );
             },
             child: ElevatedButton(
-              onPressed: () => eventWatchable.emit('Button pressed!'),
+              onPressed: () => _eventWatchable.emit('Button pressed!'),
               child: const Text('Trigger Event'),
             ),
           ),

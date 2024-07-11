@@ -29,7 +29,7 @@ Then run `flutter pub get` to install the package.
 Use `StateWatchable` for managing mutable state:
 
 ```dart
-final counterWatchable = StateWatchable<int>(0);
+final counterWatchable = MutableStateWatchable<int>(0);
 
 WatchableBuilder<int>(
   watchable: counterWatchable,
@@ -47,8 +47,8 @@ counterWatchable.emit(counterWatchable.value + 1);
 Manage form state easily:
 
 ```dart
-final nameWatchable = StateWatchable<String>('');
-final emailWatchable = StateWatchable<String>('');
+final nameWatchable = MutableStateWatchable<String>('');
+final emailWatchable = MutableStateWatchable<String>('');
 
 TextField(
   onChanged: (value) => nameWatchable.emit(value),
@@ -96,8 +96,8 @@ notificationWatchable.emit('New notification!');
 Easily combine multiple state objects:
 
 ```dart
-final userWatchable = StateWatchable<User?>(null);
-final postsWatchable = StateWatchable<List<Post>>([]);
+final userWatchable = MutableStateWatchable<User?>(null);
+final postsWatchable = MutableStateWatchable<List<Post>>([]);
 
 WatchableBuilder.from2<User?, List<Post>, Widget>(
   watchable1: userWatchable,
@@ -127,20 +127,23 @@ WatchableBuilder<List<Item>>(
 )
 ```
 
-### Managing Complex State
+### Managing Complex State & Encapsulated State Access
 
-For more complex state, you can create a custom state class:
+For more complex state & for controlled access to its state, you can create a custom state class:
 
 ```dart
 class AppState {
-  final StateWatchable<User?> user = StateWatchable(null);
-  final StateWatchable<List<Todo>> todos = StateWatchable([]);
-  final Watchable<String> notifications = Watchable();
+  final _user = MutableStateWatchable(null);
+  StateWatchable<User?> get user => _user;
+  final _todos = MutableStateWatchable([]);
+  StateWatchable<List<Todo>> get todos => _todos;
+  final _notifications = Watchable();
+  Watchable<String> get notifications => _notifications;
 
-  void login(User user) => this.user.emit(user);
-  void logout() => this.user.emit(null);
-  void addTodo(Todo todo) => todos.emit([...todos.value, todo]);
-  void notify(String message) => notifications.emit(message);
+  void login(User user) => _user.emit(user);
+  void logout() => _user.emit(null);
+  void addTodo(Todo todo) => _todos.emit([...todos.value, todo]);
+  void notify(String message) => _notifications.emit(message);
 }
 
 final appState = AppState();
