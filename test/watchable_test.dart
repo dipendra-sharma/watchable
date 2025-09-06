@@ -2,6 +2,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:watchable/watchable.dart';
 
+// Test class for generic type testing
+class User {
+  final String name;
+  final int id;
+  
+  User({this.name = 'Test User', this.id = 1});
+  
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is User && runtimeType == other.runtimeType && 
+      name == other.name && id == other.id;
+  
+  @override
+  int get hashCode => name.hashCode ^ id.hashCode;
+}
+
 void main() {
   group('MutableWatchable', () {
     test('emit value to subscribers', () {
@@ -2093,6 +2110,1169 @@ void main() {
       
       source.emit(100);
       expect(finalResults.last, 'Processed: value_100');
+    });
+  });
+
+  // ============================================================================
+  // EXTENSION API TESTS - Testing new .watch syntax and shortcuts
+  // ============================================================================
+  
+  group('Extension API Tests', () {
+    group('Basic .watch Extension', () {
+      test('should create WInt from int.watch', () {
+        final counter = 0.watch;
+        expect(counter, isA<WInt>());
+        expect(counter.value, 0);
+        
+        // Test functionality
+        int? receivedValue;
+        counter.watch((value) => receivedValue = value);
+        
+        counter.emit(42);
+        expect(counter.value, 42);
+        expect(receivedValue, 42);
+      });
+
+      test('should create WString from string.watch', () {
+        final name = 'John'.watch;
+        expect(name, isA<WString>());
+        expect(name.value, 'John');
+        
+        // Test functionality
+        String? receivedValue;
+        name.watch((value) => receivedValue = value);
+        
+        name.emit('Jane');
+        expect(name.value, 'Jane');
+        expect(receivedValue, 'Jane');
+      });
+
+      test('should create WBool from bool.watch', () {
+        final flag = false.watch;
+        expect(flag, isA<WBool>());
+        expect(flag.value, false);
+        
+        // Test functionality
+        bool? receivedValue;
+        flag.watch((value) => receivedValue = value);
+        
+        flag.emit(true);
+        expect(flag.value, true);
+        expect(receivedValue, true);
+      });
+
+      test('should create WDouble from double.watch', () {
+        final price = 99.99.watch;
+        expect(price, isA<WDouble>());
+        expect(price.value, 99.99);
+        
+        // Test functionality
+        double? receivedValue;
+        price.watch((value) => receivedValue = value);
+        
+        price.emit(89.99);
+        expect(price.value, 89.99);
+        expect(receivedValue, 89.99);
+      });
+
+      test('should create WList from list.watch', () {
+        final items = <String>['item1'].watch;
+        expect(items, isA<WList<String>>());
+        expect(items.value, ['item1']);
+        
+        // Test functionality
+        List<String>? receivedValue;
+        items.watch((value) => receivedValue = value);
+        
+        items.emit(['item1', 'item2']);
+        expect(items.value, ['item1', 'item2']);
+        expect(receivedValue, ['item1', 'item2']);
+      });
+
+      test('should create WMap from map.watch', () {
+        final config = <String, int>{'timeout': 30}.watch;
+        expect(config, isA<WMap<String, int>>());
+        expect(config.value, {'timeout': 30});
+        
+        // Test functionality
+        Map<String, int>? receivedValue;
+        config.watch((value) => receivedValue = value);
+        
+        config.emit({'timeout': 60, 'retries': 3});
+        expect(config.value, {'timeout': 60, 'retries': 3});
+        expect(receivedValue, {'timeout': 60, 'retries': 3});
+      });
+
+      test('should create W<T> from generic.watch', () {
+        final user = User().watch;
+        expect(user, isA<W<User>>());
+        expect(user.value, isA<User>());
+        
+        // Test functionality
+        User? receivedValue;
+        user.watch((value) => receivedValue = value);
+        
+        final newUser = User();
+        user.emit(newUser);
+        expect(user.value, newUser);
+        expect(receivedValue, newUser);
+      });
+    });
+
+    group('Type Aliases Tests', () {
+      test('WInt should be equivalent to MutableStateWatchable<int>', () {
+        final counter1 = WInt(42);
+        final counter2 = MutableStateWatchable<int>(42);
+        
+        expect(counter1.runtimeType, counter2.runtimeType);
+        expect(counter1.value, counter2.value);
+      });
+
+      test('WString should be equivalent to MutableStateWatchable<String>', () {
+        final name1 = WString('John');
+        final name2 = MutableStateWatchable<String>('John');
+        
+        expect(name1.runtimeType, name2.runtimeType);
+        expect(name1.value, name2.value);
+      });
+
+      test('WBool should be equivalent to MutableStateWatchable<bool>', () {
+        final flag1 = WBool(true);
+        final flag2 = MutableStateWatchable<bool>(true);
+        
+        expect(flag1.runtimeType, flag2.runtimeType);
+        expect(flag1.value, flag2.value);
+      });
+
+      test('WDouble should be equivalent to MutableStateWatchable<double>', () {
+        final price1 = WDouble(99.99);
+        final price2 = MutableStateWatchable<double>(99.99);
+        
+        expect(price1.runtimeType, price2.runtimeType);
+        expect(price1.value, price2.value);
+      });
+
+      test('WList should be equivalent to MutableStateWatchable<List>', () {
+        final items1 = WList<String>(['item1']);
+        final items2 = MutableStateWatchable<List<String>>(['item1']);
+        
+        expect(items1.runtimeType, items2.runtimeType);
+        expect(items1.value, items2.value);
+      });
+
+      test('WMap should be equivalent to MutableStateWatchable<Map>', () {
+        final config1 = WMap<String, int>({'timeout': 30});
+        final config2 = MutableStateWatchable<Map<String, int>>({'timeout': 30});
+        
+        expect(config1.runtimeType, config2.runtimeType);
+        expect(config1.value, config2.value);
+      });
+
+      test('WEvent should be equivalent to MutableWatchable', () {
+        final events1 = WEvent<String>();
+        final events2 = MutableWatchable<String>();
+        
+        expect(events1.runtimeType, events2.runtimeType);
+        expect(events1.replayCache, events2.replayCache);
+      });
+
+      test('W<T> should be equivalent to MutableStateWatchable<T>', () {
+        final user1 = W<User>(User());
+        final user2 = MutableStateWatchable<User>(User());
+        
+        expect(user1.runtimeType, user2.runtimeType);
+      });
+    });
+
+    group('Widget Extension Tests', () {
+      testWidgets('StateWatchable.build should work like WatchableBuilder', (tester) async {
+        final counter = 0.watch;
+        
+        int buildCount = 0;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: counter.build((value) {
+              buildCount++;
+              return Text('Count: $value');
+            }),
+          ),
+        );
+        
+        expect(find.text('Count: 0'), findsOneWidget);
+        expect(buildCount, 1);
+        
+        counter.emit(42);
+        await tester.pump();
+        
+        expect(find.text('Count: 42'), findsOneWidget);
+        expect(buildCount, 2);
+      });
+
+      testWidgets('StateWatchable.build with shouldRebuild should work', (tester) async {
+        final counter = 0.watch;
+        
+        int buildCount = 0;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: counter.build(
+              (value) {
+                buildCount++;
+                return Text('Count: $value');
+              },
+              shouldRebuild: (previous, current) => current % 2 == 0,
+            ),
+          ),
+        );
+        
+        expect(buildCount, 1); // Initial build
+        
+        counter.emit(1); // Odd - should not rebuild
+        await tester.pump();
+        expect(buildCount, 1);
+        
+        counter.emit(2); // Even - should rebuild
+        await tester.pump();
+        expect(buildCount, 2);
+        expect(find.text('Count: 2'), findsOneWidget);
+      });
+
+      testWidgets('Watchable.consume should work like WatchableConsumer', (tester) async {
+        final events = WEvent<String>();
+        
+        List<String> receivedEvents = [];
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: events.consume(
+              onEvent: (message) => receivedEvents.add(message),
+              child: const Text('Child Widget'),
+            ),
+          ),
+        );
+        
+        expect(find.text('Child Widget'), findsOneWidget);
+        expect(receivedEvents.isEmpty, true);
+        
+        events.emit('Event 1');
+        await tester.pump();
+        
+        expect(receivedEvents, ['Event 1']);
+        expect(find.text('Child Widget'), findsOneWidget); // Child unchanged
+        
+        events.emit('Event 2');
+        await tester.pump();
+        
+        expect(receivedEvents, ['Event 1', 'Event 2']);
+      });
+    });
+
+    group('Extension API Equivalence Tests', () {
+      test('extension API should behave identically to traditional API', () {
+        // Create same state using both APIs
+        final traditionalCounter = MutableStateWatchable<int>(0);
+        final extensionCounter = 0.watch;
+        
+        // Both should receive same values
+        List<int> traditionalValues = [];
+        List<int> extensionValues = [];
+        
+        traditionalCounter.watch((value) => traditionalValues.add(value));
+        extensionCounter.watch((value) => extensionValues.add(value));
+        
+        // Emit same values to both
+        for (int i = 1; i <= 10; i++) {
+          traditionalCounter.emit(i);
+          extensionCounter.emit(i);
+        }
+        
+        // Results should be identical
+        expect(extensionValues, traditionalValues);
+        expect(extensionCounter.value, traditionalCounter.value);
+      });
+
+      testWidgets('extension widgets should behave identically to traditional widgets', (tester) async {
+        final traditionalCounter = MutableStateWatchable<int>(0);
+        final extensionCounter = 0.watch;
+        
+        int traditionalBuildCount = 0;
+        int extensionBuildCount = 0;
+        
+        // Traditional widget
+        final traditionalWidget = WatchableBuilder<int>(
+          watchable: traditionalCounter,
+          builder: (context, value, child) {
+            traditionalBuildCount++;
+            return Text('Traditional: $value');
+          },
+        );
+        
+        // Extension widget
+        final extensionWidget = extensionCounter.build((value) {
+          extensionBuildCount++;
+          return Text('Extension: $value');
+        });
+        
+        // Test traditional widget
+        await tester.pumpWidget(MaterialApp(home: traditionalWidget));
+        expect(traditionalBuildCount, 1);
+        
+        traditionalCounter.emit(42);
+        await tester.pump();
+        expect(traditionalBuildCount, 2);
+        
+        // Test extension widget
+        await tester.pumpWidget(MaterialApp(home: extensionWidget));
+        expect(extensionBuildCount, 1);
+        
+        extensionCounter.emit(42);
+        await tester.pump();
+        expect(extensionBuildCount, 2);
+        
+        // Both should have same build pattern
+        expect(extensionBuildCount, traditionalBuildCount);
+      });
+
+      test('extension event handling should behave identically', () {
+        final traditionalEvents = MutableWatchable<String>();
+        final extensionEvents = WEvent<String>();
+        
+        List<String> traditionalReceived = [];
+        List<String> extensionReceived = [];
+        
+        traditionalEvents.watch((event) => traditionalReceived.add(event));
+        extensionEvents.watch((event) => extensionReceived.add(event));
+        
+        // Emit same events to both
+        for (int i = 1; i <= 5; i++) {
+          final event = 'Event $i';
+          traditionalEvents.emit(event);
+          extensionEvents.emit(event);
+        }
+        
+        expect(extensionReceived, traditionalReceived);
+        expect(extensionReceived.length, 5);
+      });
+    });
+
+    group('Extension API Memory Management Tests', () {
+      test('extension watchables should handle disposal correctly', () {
+        final counter = 0.watch;
+        final events = WEvent<String>();
+        
+        bool counterWatcherCalled = false;
+        bool eventsWatcherCalled = false;
+        
+        counter.watch((value) => counterWatcherCalled = true);
+        events.watch((value) => eventsWatcherCalled = true);
+        
+        // Dispose both
+        counter.dispose();
+        events.dispose();
+        
+        // Try to watch after disposal - should throw StateError
+        expect(() => counter.watch((value) {}), throwsStateError);
+        expect(() => events.watch((value) {}), throwsStateError);
+        
+        // Emit values after disposal should work (no exception), but no watchers called
+        counter.emit(42); // This won't throw but no watchers will be called
+        events.emit('test'); // Same here
+        
+        expect(counterWatcherCalled, true); // Called during initial construction
+        expect(eventsWatcherCalled, false); // Events don't have initial values, so watcher not called initially
+      });
+
+      testWidgets('extension widgets should handle disposal correctly', (tester) async {
+        final counter = 0.watch;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: counter.build((value) => Text('$value')),
+          ),
+        );
+        
+        expect(counter.watcherCount, 1); // Widget is watching
+        
+        // Dispose widget by pumping empty widget
+        await tester.pumpWidget(Container());
+        
+        expect(counter.watcherCount, 0); // Widget stopped watching
+      });
+    });
+
+    group('Extension API Performance Tests', () {
+      test('extension API should have same performance as traditional API', () {
+        final traditionalCounter = MutableStateWatchable<int>(0);
+        final extensionCounter = 0.watch;
+        
+        // Measure traditional API performance
+        final traditionalStopwatch = Stopwatch()..start();
+        for (int i = 0; i < 1000; i++) {
+          traditionalCounter.emit(i);
+        }
+        traditionalStopwatch.stop();
+        
+        // Measure extension API performance
+        final extensionStopwatch = Stopwatch()..start();
+        for (int i = 0; i < 1000; i++) {
+          extensionCounter.emit(i);
+        }
+        extensionStopwatch.stop();
+        
+        // Extension API should not be significantly slower (allow 50% variance)
+        final ratio = extensionStopwatch.elapsedMicroseconds / traditionalStopwatch.elapsedMicroseconds;
+        expect(ratio, lessThan(1.5), reason: 'Extension API should not be significantly slower');
+        
+        expect(extensionCounter.value, 999);
+        expect(traditionalCounter.value, 999);
+      });
+
+      test('extension API should handle high load correctly', () {
+        final counter = 0.watch;
+        final events = WEvent<String>();
+        
+        int counterCallCount = 0;
+        int eventsCallCount = 0;
+        
+        counter.watch((value) => counterCallCount++);
+        events.watch((value) => eventsCallCount++);
+        
+        // High load test
+        for (int i = 0; i < 10000; i++) {
+          counter.emit(i);
+          events.emit('Event $i');
+        }
+        
+        expect(counterCallCount, 10000); // No +1 because counter doesn't auto-emit initial on watch
+        expect(eventsCallCount, 10000);
+        expect(counter.value, 9999);
+      });
+    });
+
+    group('Extension API Edge Cases', () {
+      test('should handle null values correctly with extensions', () {
+        final nullableString = W<String?>(null);
+        expect(nullableString.value, null);
+        
+        String? receivedValue = 'not null';
+        nullableString.watch((value) => receivedValue = value);
+        
+        nullableString.emit('hello');
+        expect(receivedValue, 'hello');
+        
+        nullableString.emit(null);
+        expect(receivedValue, null);
+      });
+
+      test('should handle complex generic types with extensions', () {
+        final complexMap = <String, List<int>>{}.watch;
+        expect(complexMap, isA<WMap<String, List<int>>>());
+        
+        Map<String, List<int>>? received;
+        complexMap.watch((value) => received = value);
+        
+        complexMap.emit({'numbers': [1, 2, 3], 'more': [4, 5]});
+        expect(received, {'numbers': [1, 2, 3], 'more': [4, 5]});
+      });
+
+      test('should handle custom comparison functions with extensions', () {
+        final counter = WInt(0, compare: (old, current) => (old - current).abs() < 2);
+        
+        int callCount = 0;
+        counter.watch((value) => callCount++);
+        
+        counter.emit(1); // Difference is 1, should not emit
+        expect(callCount, 1); // Only initial call
+        expect(counter.value, 0); // Value unchanged
+        
+        counter.emit(3); // Difference is 3, should emit
+        expect(callCount, 2);
+        expect(counter.value, 3);
+      });
+    });
+
+    group('Combiner Extension Tests', () {
+      test('should combine 2 watchables with tuple extension', () {
+        final name = 'John'.watch;
+        final age = 25.watch;
+        
+        final combined = (name, age).combine((n, a) => 'Name: $n, Age: $a');
+        
+        expect(combined.value, 'Name: John, Age: 25');
+        
+        String? receivedValue;
+        combined.watch((value) => receivedValue = value);
+        
+        name.emit('Jane');
+        expect(combined.value, 'Name: Jane, Age: 25');
+        expect(receivedValue, 'Name: Jane, Age: 25');
+        
+        age.emit(30);
+        expect(combined.value, 'Name: Jane, Age: 30');
+        expect(receivedValue, 'Name: Jane, Age: 30');
+      });
+
+      test('should combine 3 watchables with tuple extension', () {
+        final first = 'John'.watch;
+        final last = 'Doe'.watch;
+        final age = 25.watch;
+        
+        final combined = (first, last, age).combine((f, l, a) => '$f $l ($a)');
+        
+        expect(combined.value, 'John Doe (25)');
+        
+        String? receivedValue;
+        combined.watch((value) => receivedValue = value);
+        
+        first.emit('Jane');
+        expect(combined.value, 'Jane Doe (25)');
+        expect(receivedValue, 'Jane Doe (25)');
+      });
+
+      testWidgets('should build widget from 2 watchables with tuple extension', (tester) async {
+        final name = 'John'.watch;
+        final age = 25.watch;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: (name, age).build((n, a) => Text('$n is $a years old')),
+          ),
+        );
+        
+        expect(find.text('John is 25 years old'), findsOneWidget);
+        
+        name.emit('Jane');
+        await tester.pump();
+        
+        expect(find.text('Jane is 25 years old'), findsOneWidget);
+        
+        age.emit(30);
+        await tester.pump();
+        
+        expect(find.text('Jane is 30 years old'), findsOneWidget);
+      });
+
+      test('should use Watch.combine2 for combining watchables', () {
+        final name = 'John'.watch;
+        final age = 25.watch;
+        
+        final combined = Watch.combine2(name, age, (n, a) => 'Name: $n, Age: $a');
+        
+        expect(combined.value, 'Name: John, Age: 25');
+        
+        String? receivedValue;
+        combined.watch((value) => receivedValue = value);
+        
+        name.emit('Jane');
+        expect(combined.value, 'Name: Jane, Age: 25');
+        expect(receivedValue, 'Name: Jane, Age: 25');
+      });
+
+      testWidgets('should use Watch.build2 for building widgets', (tester) async {
+        final name = 'John'.watch;
+        final age = 25.watch;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Watch.build2(name, age, (n, a) => Text('$n is $a years old')),
+          ),
+        );
+        
+        expect(find.text('John is 25 years old'), findsOneWidget);
+        
+        name.emit('Jane');
+        await tester.pump();
+        
+        expect(find.text('Jane is 25 years old'), findsOneWidget);
+      });
+
+      test('should combine multiple different types correctly', () {
+        final name = 'John'.watch;
+        final age = 25.watch;
+        final isActive = true.watch;
+        final score = 95.5.watch;
+        
+        final combined = Watch.combine4(name, age, isActive, score, 
+          (n, a, active, s) => 'User: $n ($a), Active: $active, Score: $s');
+        
+        expect(combined.value, 'User: John (25), Active: true, Score: 95.5');
+        
+        String? receivedValue;
+        combined.watch((value) => receivedValue = value);
+        
+        isActive.emit(false);
+        expect(combined.value, 'User: John (25), Active: false, Score: 95.5');
+        expect(receivedValue, 'User: John (25), Active: false, Score: 95.5');
+      });
+
+      testWidgets('should handle complex form validation with combiners', (tester) async {
+        final email = ''.watch;
+        final password = ''.watch;
+        final confirmPassword = ''.watch;
+        final agreedToTerms = false.watch;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Column(
+                children: [
+                  // Form inputs would go here
+                  Watch.build4(email, password, confirmPassword, agreedToTerms, 
+                    (e, p, cp, agreed) {
+                      final isValidEmail = e.contains('@');
+                      final isValidPassword = p.length >= 6;
+                      final passwordsMatch = p == cp;
+                      final isFormValid = isValidEmail && isValidPassword && passwordsMatch && agreed;
+                      
+                      return ElevatedButton(
+                        onPressed: isFormValid ? () {} : null,
+                        child: Text(isFormValid ? 'Submit' : 'Fix errors'),
+                      );
+                    }
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        
+        expect(find.text('Fix errors'), findsOneWidget);
+        
+        // Fill form correctly
+        email.emit('test@example.com');
+        password.emit('password123');
+        confirmPassword.emit('password123');
+        agreedToTerms.emit(true);
+        await tester.pump();
+        
+        expect(find.text('Submit'), findsOneWidget);
+      });
+
+      test('should handle custom classes in combiners', () {
+        final user1 = User(name: 'John', id: 1).watch;
+        final user2 = User(name: 'Jane', id: 2).watch;
+        
+        final combined = (user1, user2).combine((u1, u2) => 
+          'Users: ${u1.name} (${u1.id}) and ${u2.name} (${u2.id})');
+        
+        expect(combined.value, 'Users: John (1) and Jane (2)');
+        
+        String? receivedValue;
+        combined.watch((value) => receivedValue = value);
+        
+        user1.emit(User(name: 'Bob', id: 3));
+        expect(combined.value, 'Users: Bob (3) and Jane (2)');
+        expect(receivedValue, 'Users: Bob (3) and Jane (2)');
+      });
+
+      test('should combine 6 watchables with tuple extension', () {
+        final firstName = 'John'.watch;
+        final lastName = 'Doe'.watch;
+        final age = 25.watch;
+        final email = 'john@example.com'.watch;
+        final isActive = true.watch;
+        final score = 95.5.watch;
+        
+        final combined = (firstName, lastName, age, email, isActive, score).combine(
+          (first, last, a, e, active, s) => 
+            'User: $first $last ($a), Email: $e, Active: $active, Score: $s'
+        );
+        
+        expect(combined.value, 'User: John Doe (25), Email: john@example.com, Active: true, Score: 95.5');
+        
+        String? receivedValue;
+        combined.watch((value) => receivedValue = value);
+        
+        firstName.emit('Jane');
+        expect(combined.value, 'User: Jane Doe (25), Email: john@example.com, Active: true, Score: 95.5');
+        expect(receivedValue, 'User: Jane Doe (25), Email: john@example.com, Active: true, Score: 95.5');
+        
+        isActive.emit(false);
+        expect(combined.value, 'User: Jane Doe (25), Email: john@example.com, Active: false, Score: 95.5');
+        expect(receivedValue, 'User: Jane Doe (25), Email: john@example.com, Active: false, Score: 95.5');
+      });
+
+      testWidgets('should build widget from 6 watchables with tuple extension', (tester) async {
+        final firstName = 'John'.watch;
+        final lastName = 'Doe'.watch;
+        final age = 25.watch;
+        final email = 'john@example.com'.watch;
+        final isActive = true.watch;
+        final score = 95.5.watch;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: (firstName, lastName, age, email, isActive, score).build(
+              (first, last, a, e, active, s) => Text('$first $last ($a)')
+            ),
+          ),
+        );
+        
+        expect(find.text('John Doe (25)'), findsOneWidget);
+        
+        firstName.emit('Jane');
+        await tester.pump();
+        
+        expect(find.text('Jane Doe (25)'), findsOneWidget);
+        
+        age.emit(30);
+        await tester.pump();
+        
+        expect(find.text('Jane Doe (30)'), findsOneWidget);
+      });
+
+      test('should use Watch.combine6 for combining watchables', () {
+        final firstName = 'John'.watch;
+        final lastName = 'Doe'.watch;
+        final age = 25.watch;
+        final email = 'john@example.com'.watch;
+        final isActive = true.watch;
+        final score = 95.5.watch;
+        
+        final combined = Watch.combine6(firstName, lastName, age, email, isActive, score,
+          (first, last, a, e, active, s) => 
+            'Profile: $first $last ($a), Contact: $e, Status: $active, Score: $s'
+        );
+        
+        expect(combined.value, 'Profile: John Doe (25), Contact: john@example.com, Status: true, Score: 95.5');
+        
+        String? receivedValue;
+        combined.watch((value) => receivedValue = value);
+        
+        score.emit(87.3);
+        expect(combined.value, 'Profile: John Doe (25), Contact: john@example.com, Status: true, Score: 87.3');
+        expect(receivedValue, 'Profile: John Doe (25), Contact: john@example.com, Status: true, Score: 87.3');
+      });
+
+      testWidgets('should use Watch.build6 for building widgets', (tester) async {
+        final firstName = 'John'.watch;
+        final lastName = 'Doe'.watch;
+        final age = 25.watch;
+        final email = 'john@example.com'.watch;
+        final isActive = true.watch;
+        final score = 95.5.watch;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Watch.build6(firstName, lastName, age, email, isActive, score,
+              (first, last, a, e, active, s) => Text('$first: $s')
+            ),
+          ),
+        );
+        
+        expect(find.text('John: 95.5'), findsOneWidget);
+        
+        firstName.emit('Jane');
+        score.emit(88.0);
+        await tester.pump();
+        
+        expect(find.text('Jane: 88.0'), findsOneWidget);
+      });
+
+      testWidgets('should handle complex 6-item form validation', (tester) async {
+        final email = ''.watch;
+        final password = ''.watch;
+        final confirmPassword = ''.watch;
+        final firstName = ''.watch;
+        final lastName = ''.watch;
+        final agreedToTerms = false.watch;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: (email, password, confirmPassword, firstName, lastName, agreedToTerms).build(
+                (e, p, cp, fn, ln, agreed) {
+                  final isValidEmail = e.contains('@');
+                  final isValidPassword = p.length >= 6;
+                  final passwordsMatch = p == cp;
+                  final hasNames = fn.isNotEmpty && ln.isNotEmpty;
+                  final isFormValid = isValidEmail && isValidPassword && passwordsMatch && hasNames && agreed;
+                  
+                  return ElevatedButton(
+                    onPressed: isFormValid ? () {} : null,
+                    child: Text(isFormValid ? 'Create Account' : 'Complete Form'),
+                  );
+                }
+              ),
+            ),
+          ),
+        );
+        
+        expect(find.text('Complete Form'), findsOneWidget);
+        
+        // Fill all fields correctly
+        email.emit('test@example.com');
+        password.emit('password123');
+        confirmPassword.emit('password123');
+        firstName.emit('John');
+        lastName.emit('Doe');
+        agreedToTerms.emit(true);
+        await tester.pump();
+        
+        expect(find.text('Create Account'), findsOneWidget);
+        
+        // Break one requirement
+        password.emit('123'); // Too short
+        await tester.pump();
+        
+        expect(find.text('Complete Form'), findsOneWidget);
+      });
+    });
+
+    group('Widget Rerendering Tests', () {
+      testWidgets('only affected widgets should rebuild when state changes', (tester) async {
+        final counter1 = 0.watch;
+        final counter2 = 100.watch;
+        
+        int widget1BuildCount = 0;
+        int widget2BuildCount = 0;
+        int parentBuildCount = 0;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Builder(
+              builder: (context) {
+                parentBuildCount++;
+                return Column(
+                  children: [
+                    counter1.build((value) {
+                      widget1BuildCount++;
+                      return Text('Counter 1: $value', key: const Key('counter1'));
+                    }),
+                    counter2.build((value) {
+                      widget2BuildCount++;
+                      return Text('Counter 2: $value', key: const Key('counter2'));
+                    }),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+        
+        // Initial build
+        expect(widget1BuildCount, 1);
+        expect(widget2BuildCount, 1);
+        expect(parentBuildCount, 1);
+        
+        // Change counter1 only
+        counter1.emit(42);
+        await tester.pump();
+        
+        // Only widget1 should rebuild, not widget2 or parent
+        expect(widget1BuildCount, 2);
+        expect(widget2BuildCount, 1); // Should NOT rebuild
+        expect(parentBuildCount, 1);  // Should NOT rebuild
+        expect(find.text('Counter 1: 42'), findsOneWidget);
+        expect(find.text('Counter 2: 100'), findsOneWidget);
+        
+        // Change counter2 only
+        counter2.emit(200);
+        await tester.pump();
+        
+        // Only widget2 should rebuild
+        expect(widget1BuildCount, 2);  // Should NOT rebuild
+        expect(widget2BuildCount, 2); 
+        expect(parentBuildCount, 1);   // Should NOT rebuild
+        expect(find.text('Counter 1: 42'), findsOneWidget);
+        expect(find.text('Counter 2: 200'), findsOneWidget);
+      });
+
+      testWidgets('shouldRebuild parameter prevents unnecessary rebuilds', (tester) async {
+        final counter = 0.watch;
+        int widgetBuildCount = 0;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: counter.build(
+              (value) {
+                widgetBuildCount++;
+                return Text('Even: $value', key: const Key('even-counter'));
+              },
+              shouldRebuild: (previous, current) => current % 2 == 0,
+            ),
+          ),
+        );
+        
+        // Initial build (0 is even)
+        expect(widgetBuildCount, 1);
+        expect(find.text('Even: 0'), findsOneWidget);
+        
+        // Emit odd number - should NOT rebuild
+        counter.emit(1);
+        await tester.pump();
+        expect(widgetBuildCount, 1); // No rebuild
+        expect(find.text('Even: 0'), findsOneWidget); // Still shows old value
+        
+        // Emit even number - should rebuild
+        counter.emit(2);
+        await tester.pump();
+        expect(widgetBuildCount, 2); // Rebuilt
+        expect(find.text('Even: 2'), findsOneWidget);
+        
+        // Another odd number - should NOT rebuild
+        counter.emit(3);
+        await tester.pump();
+        expect(widgetBuildCount, 2); // No rebuild
+        expect(find.text('Even: 2'), findsOneWidget); // Still shows previous even value
+        
+        // Another even number - should rebuild
+        counter.emit(4);
+        await tester.pump();
+        expect(widgetBuildCount, 3); // Rebuilt
+        expect(find.text('Even: 4'), findsOneWidget);
+      });
+
+      testWidgets('combiner widgets only rebuild when dependent state changes', (tester) async {
+        final firstName = 'John'.watch;
+        final lastName = 'Doe'.watch;
+        final age = 25.watch;
+        
+        int fullNameBuildCount = 0;
+        int userInfoBuildCount = 0;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Column(
+              children: [
+                // Combiner depending on firstName + lastName
+                (firstName, lastName).build((fn, ln) {
+                  fullNameBuildCount++;
+                  return Text('Name: $fn $ln', key: const Key('fullname'));
+                }),
+                // Combiner depending on firstName + age
+                (firstName, age).build((fn, a) {
+                  userInfoBuildCount++;
+                  return Text('User: $fn ($a)', key: const Key('userinfo'));
+                }),
+              ],
+            ),
+          ),
+        );
+        
+        // Initial builds - combiners may build multiple times during setup
+        // due to initial emissions from each dependency
+        expect(fullNameBuildCount, greaterThanOrEqualTo(1));
+        expect(userInfoBuildCount, greaterThanOrEqualTo(1));
+        final initialFullNameBuildCount = fullNameBuildCount;
+        final initialUserInfoBuildCount = userInfoBuildCount;
+        expect(find.text('Name: John Doe'), findsOneWidget);
+        expect(find.text('User: John (25)'), findsOneWidget);
+        
+        // Change firstName - both should rebuild
+        firstName.emit('Jane');
+        await tester.pump();
+        expect(fullNameBuildCount, initialFullNameBuildCount + 1);
+        expect(userInfoBuildCount, initialUserInfoBuildCount + 1);
+        expect(find.text('Name: Jane Doe'), findsOneWidget);
+        expect(find.text('User: Jane (25)'), findsOneWidget);
+        
+        // Change lastName - only fullName should rebuild
+        final beforeLastNameFullNameCount = fullNameBuildCount;
+        final beforeLastNameUserInfoCount = userInfoBuildCount;
+        lastName.emit('Smith');
+        await tester.pump();
+        expect(fullNameBuildCount, beforeLastNameFullNameCount + 1);
+        expect(userInfoBuildCount, beforeLastNameUserInfoCount); // Should NOT rebuild
+        expect(find.text('Name: Jane Smith'), findsOneWidget);
+        expect(find.text('User: Jane (25)'), findsOneWidget);
+        
+        // Change age - only userInfo should rebuild
+        final beforeAgeFullNameCount = fullNameBuildCount;
+        final beforeAgeUserInfoCount = userInfoBuildCount;
+        age.emit(30);
+        await tester.pump();
+        expect(fullNameBuildCount, beforeAgeFullNameCount); // Should NOT rebuild
+        expect(userInfoBuildCount, beforeAgeUserInfoCount + 1);
+        expect(find.text('Name: Jane Smith'), findsOneWidget);
+        expect(find.text('User: Jane (30)'), findsOneWidget);
+      });
+
+      testWidgets('Watch.build2-6 methods have isolated rebuilding', (tester) async {
+        final a = 1.watch;
+        final b = 2.watch;
+        final c = 3.watch;
+        final d = 4.watch;
+        final e = 5.watch;
+        final f = 6.watch;
+        
+        int build2Count = 0;
+        int build3Count = 0;
+        int build6Count = 0;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Column(
+              children: [
+                Watch.build2(a, b, (av, bv) {
+                  build2Count++;
+                  return Text('Sum2: ${av + bv}', key: const Key('sum2'));
+                }),
+                Watch.build3(a, b, c, (av, bv, cv) {
+                  build3Count++;
+                  return Text('Sum3: ${av + bv + cv}', key: const Key('sum3'));
+                }),
+                Watch.build6(a, b, c, d, e, f, (av, bv, cv, dv, ev, fv) {
+                  build6Count++;
+                  return Text('Sum6: ${av + bv + cv + dv + ev + fv}', key: const Key('sum6'));
+                }),
+              ],
+            ),
+          ),
+        );
+        
+        // Initial builds - combiners may build multiple times during setup
+        expect(build2Count, greaterThanOrEqualTo(1));
+        expect(build3Count, greaterThanOrEqualTo(1));
+        expect(build6Count, greaterThanOrEqualTo(1));
+        final initialBuild2Count = build2Count;
+        final initialBuild3Count = build3Count;
+        final initialBuild6Count = build6Count;
+        expect(find.text('Sum2: 3'), findsOneWidget);
+        expect(find.text('Sum3: 6'), findsOneWidget);
+        expect(find.text('Sum6: 21'), findsOneWidget);
+        
+        // Change 'a' - all should rebuild
+        a.emit(10);
+        await tester.pump();
+        expect(build2Count, initialBuild2Count + 1);
+        expect(build3Count, initialBuild3Count + 1);
+        expect(build6Count, initialBuild6Count + 1);
+        expect(find.text('Sum2: 12'), findsOneWidget);
+        expect(find.text('Sum3: 15'), findsOneWidget);
+        expect(find.text('Sum6: 30'), findsOneWidget);
+        
+        // Change 'c' - only build3 and build6 should rebuild
+        final beforeCBuild2Count = build2Count;
+        final beforeCBuild3Count = build3Count;
+        final beforeCBuild6Count = build6Count;
+        c.emit(30);
+        await tester.pump();
+        expect(build2Count, beforeCBuild2Count);    // Should NOT rebuild
+        expect(build3Count, beforeCBuild3Count + 1);    // Should rebuild
+        expect(build6Count, beforeCBuild6Count + 1);    // Should rebuild
+        expect(find.text('Sum2: 12'), findsOneWidget);
+        expect(find.text('Sum3: 42'), findsOneWidget);
+        expect(find.text('Sum6: 57'), findsOneWidget);
+        
+        // Change 'f' - only build6 should rebuild
+        final beforeFBuild2Count = build2Count;
+        final beforeFBuild3Count = build3Count;
+        final beforeFBuild6Count = build6Count;
+        f.emit(60);
+        await tester.pump();
+        expect(build2Count, beforeFBuild2Count);    // Should NOT rebuild
+        expect(build3Count, beforeFBuild3Count);    // Should NOT rebuild
+        expect(build6Count, beforeFBuild6Count + 1);    // Should rebuild
+        expect(find.text('Sum2: 12'), findsOneWidget);
+        expect(find.text('Sum3: 42'), findsOneWidget);
+        expect(find.text('Sum6: 111'), findsOneWidget);
+      });
+
+      testWidgets('event consumers do not cause unnecessary rebuilds', (tester) async {
+        final notifications = WEvent<String>();
+        final counter = 0.watch;
+        
+        int consumerChildBuildCount = 0;
+        int otherWidgetBuildCount = 0;
+        String? lastEvent;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Column(
+              children: [
+                notifications.consume(
+                  onEvent: (event) => lastEvent = event,
+                  child: Builder(
+                    builder: (context) {
+                      consumerChildBuildCount++;
+                      return const Text('Consumer Child', key: Key('consumer-child'));
+                    },
+                  ),
+                ),
+                counter.build((value) {
+                  otherWidgetBuildCount++;
+                  return Text('Counter: $value', key: const Key('other-widget'));
+                }),
+              ],
+            ),
+          ),
+        );
+        
+        // Initial builds
+        expect(consumerChildBuildCount, 1);
+        expect(otherWidgetBuildCount, 1);
+        expect(lastEvent, null);
+        
+        // Emit event - should NOT cause consumer child to rebuild
+        notifications.emit('Test Event 1');
+        await tester.pump();
+        expect(consumerChildBuildCount, 1); // Should NOT rebuild
+        expect(otherWidgetBuildCount, 1);   // Should NOT rebuild
+        expect(lastEvent, 'Test Event 1');
+        
+        // Change counter - should only rebuild counter widget
+        counter.emit(42);
+        await tester.pump();
+        expect(consumerChildBuildCount, 1); // Should NOT rebuild
+        expect(otherWidgetBuildCount, 2);   // Should rebuild
+        expect(lastEvent, 'Test Event 1');
+        
+        // Another event - still no rebuilds
+        notifications.emit('Test Event 2');
+        await tester.pump();
+        expect(consumerChildBuildCount, 1); // Should NOT rebuild
+        expect(otherWidgetBuildCount, 2);   // Should NOT rebuild
+        expect(lastEvent, 'Test Event 2');
+      });
+
+      testWidgets('traditional WatchableBuilder has same rebuild isolation', (tester) async {
+        final counter1 = MutableStateWatchable<int>(0);
+        final counter2 = MutableStateWatchable<int>(100);
+        
+        int widget1BuildCount = 0;
+        int widget2BuildCount = 0;
+        
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Column(
+              children: [
+                WatchableBuilder<int>(
+                  watchable: counter1,
+                  builder: (context, value, child) {
+                    widget1BuildCount++;
+                    return Text('Traditional 1: $value', key: const Key('trad1'));
+                  },
+                ),
+                WatchableBuilder<int>(
+                  watchable: counter2,
+                  builder: (context, value, child) {
+                    widget2BuildCount++;
+                    return Text('Traditional 2: $value', key: const Key('trad2'));
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+        
+        // Initial builds
+        expect(widget1BuildCount, 1);
+        expect(widget2BuildCount, 1);
+        
+        // Change counter1 only
+        counter1.emit(42);
+        await tester.pump();
+        expect(widget1BuildCount, 2);
+        expect(widget2BuildCount, 1); // Should NOT rebuild
+        
+        // Change counter2 only
+        counter2.emit(200);
+        await tester.pump();
+        expect(widget1BuildCount, 2);  // Should NOT rebuild
+        expect(widget2BuildCount, 2);
+      });
     });
   });
 }

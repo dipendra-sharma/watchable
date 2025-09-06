@@ -1,6 +1,6 @@
 name: watchable
 description: "Production-ready, type-safe state management for Flutter. 10x performance improvement with advanced memory management and comprehensive error handling."
-version: 3.0.0
+version: 4.0.0
 homepage: "https://github.com/dipendra-sharma/watchable"
 
 environment:
