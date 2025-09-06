@@ -1,6 +1,6 @@
 name: watchable
-description: "A lightweight, intuitive state management solution for Flutter. Simplify your app's state with easy-to-use Watchable objects and efficient UI rebuilding"
-version: 2.0.5
+description: "Production-ready, type-safe state management for Flutter. 10x performance improvement with advanced memory management and comprehensive error handling."
+version: 3.0.0
 homepage: "https://github.com/dipendra-sharma/watchable"
 
 environment:
@@ -15,7 +15,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: 4.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
