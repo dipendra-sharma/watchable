@@ -40,9 +40,12 @@ class _CombineLatest3Watchable<A, B, C, T> extends MutableStateWatchable<T> {
     StateWatchable<C> watchable3,
     T Function(A, B, C) combiner,
   ) : super(combiner(watchable1.value, watchable2.value, watchable3.value)) {
-    void watcher1(A value) => emit(combiner(value, watchable2.value, watchable3.value));
-    void watcher2(B value) => emit(combiner(watchable1.value, value, watchable3.value));
-    void watcher3(C value) => emit(combiner(watchable1.value, watchable2.value, value));
+    void watcher1(A value) =>
+        emit(combiner(value, watchable2.value, watchable3.value));
+    void watcher2(B value) =>
+        emit(combiner(watchable1.value, value, watchable3.value));
+    void watcher3(C value) =>
+        emit(combiner(watchable1.value, watchable2.value, value));
 
     watchable1.watch(watcher1);
     watchable2.watch(watcher2);
@@ -71,11 +74,16 @@ class _CombineLatest4Watchable<A, B, C, D, T> extends MutableStateWatchable<T> {
     StateWatchable<C> watchable3,
     StateWatchable<D> watchable4,
     T Function(A, B, C, D) combiner,
-  ) : super(combiner(watchable1.value, watchable2.value, watchable3.value, watchable4.value)) {
-    void watcher1(A value) => emit(combiner(value, watchable2.value, watchable3.value, watchable4.value));
-    void watcher2(B value) => emit(combiner(watchable1.value, value, watchable3.value, watchable4.value));
-    void watcher3(C value) => emit(combiner(watchable1.value, watchable2.value, value, watchable4.value));
-    void watcher4(D value) => emit(combiner(watchable1.value, watchable2.value, watchable3.value, value));
+  ) : super(combiner(watchable1.value, watchable2.value, watchable3.value,
+            watchable4.value)) {
+    void watcher1(A value) => emit(
+        combiner(value, watchable2.value, watchable3.value, watchable4.value));
+    void watcher2(B value) => emit(
+        combiner(watchable1.value, value, watchable3.value, watchable4.value));
+    void watcher3(C value) => emit(
+        combiner(watchable1.value, watchable2.value, value, watchable4.value));
+    void watcher4(D value) => emit(
+        combiner(watchable1.value, watchable2.value, watchable3.value, value));
 
     watchable1.watch(watcher1);
     watchable2.watch(watcher2);
@@ -97,7 +105,8 @@ class _CombineLatest4Watchable<A, B, C, D, T> extends MutableStateWatchable<T> {
 }
 
 /// Type-safe combiner for 5 watchables
-class _CombineLatest5Watchable<A, B, C, D, E, T> extends MutableStateWatchable<T> {
+class _CombineLatest5Watchable<A, B, C, D, E, T>
+    extends MutableStateWatchable<T> {
   final List<Function> _unwatchFunctions = [];
 
   _CombineLatest5Watchable(
@@ -107,12 +116,18 @@ class _CombineLatest5Watchable<A, B, C, D, E, T> extends MutableStateWatchable<T
     StateWatchable<D> watchable4,
     StateWatchable<E> watchable5,
     T Function(A, B, C, D, E) combiner,
-  ) : super(combiner(watchable1.value, watchable2.value, watchable3.value, watchable4.value, watchable5.value)) {
-    void watcher1(A value) => emit(combiner(value, watchable2.value, watchable3.value, watchable4.value, watchable5.value));
-    void watcher2(B value) => emit(combiner(watchable1.value, value, watchable3.value, watchable4.value, watchable5.value));
-    void watcher3(C value) => emit(combiner(watchable1.value, watchable2.value, value, watchable4.value, watchable5.value));
-    void watcher4(D value) => emit(combiner(watchable1.value, watchable2.value, watchable3.value, value, watchable5.value));
-    void watcher5(E value) => emit(combiner(watchable1.value, watchable2.value, watchable3.value, watchable4.value, value));
+  ) : super(combiner(watchable1.value, watchable2.value, watchable3.value,
+            watchable4.value, watchable5.value)) {
+    void watcher1(A value) => emit(combiner(value, watchable2.value,
+        watchable3.value, watchable4.value, watchable5.value));
+    void watcher2(B value) => emit(combiner(watchable1.value, value,
+        watchable3.value, watchable4.value, watchable5.value));
+    void watcher3(C value) => emit(combiner(watchable1.value, watchable2.value,
+        value, watchable4.value, watchable5.value));
+    void watcher4(D value) => emit(combiner(watchable1.value, watchable2.value,
+        watchable3.value, value, watchable5.value));
+    void watcher5(E value) => emit(combiner(watchable1.value, watchable2.value,
+        watchable3.value, watchable4.value, value));
 
     watchable1.watch(watcher1);
     watchable2.watch(watcher2);
@@ -136,7 +151,8 @@ class _CombineLatest5Watchable<A, B, C, D, E, T> extends MutableStateWatchable<T
 }
 
 /// Type-safe combiner for 6 watchables
-class _CombineLatest6Watchable<A, B, C, D, E, F, T> extends MutableStateWatchable<T> {
+class _CombineLatest6Watchable<A, B, C, D, E, F, T>
+    extends MutableStateWatchable<T> {
   final List<Function> _unwatchFunctions = [];
 
   _CombineLatest6Watchable(
@@ -147,13 +163,30 @@ class _CombineLatest6Watchable<A, B, C, D, E, F, T> extends MutableStateWatchabl
     StateWatchable<E> watchable5,
     StateWatchable<F> watchable6,
     T Function(A, B, C, D, E, F) combiner,
-  ) : super(combiner(watchable1.value, watchable2.value, watchable3.value, watchable4.value, watchable5.value, watchable6.value)) {
-    void watcher1(A value) => emit(combiner(value, watchable2.value, watchable3.value, watchable4.value, watchable5.value, watchable6.value));
-    void watcher2(B value) => emit(combiner(watchable1.value, value, watchable3.value, watchable4.value, watchable5.value, watchable6.value));
-    void watcher3(C value) => emit(combiner(watchable1.value, watchable2.value, value, watchable4.value, watchable5.value, watchable6.value));
-    void watcher4(D value) => emit(combiner(watchable1.value, watchable2.value, watchable3.value, value, watchable5.value, watchable6.value));
-    void watcher5(E value) => emit(combiner(watchable1.value, watchable2.value, watchable3.value, watchable4.value, value, watchable6.value));
-    void watcher6(F value) => emit(combiner(watchable1.value, watchable2.value, watchable3.value, watchable4.value, watchable5.value, value));
+  ) : super(combiner(watchable1.value, watchable2.value, watchable3.value,
+            watchable4.value, watchable5.value, watchable6.value)) {
+    void watcher1(A value) => emit(combiner(
+        value,
+        watchable2.value,
+        watchable3.value,
+        watchable4.value,
+        watchable5.value,
+        watchable6.value));
+    void watcher2(B value) => emit(combiner(
+        watchable1.value,
+        value,
+        watchable3.value,
+        watchable4.value,
+        watchable5.value,
+        watchable6.value));
+    void watcher3(C value) => emit(combiner(watchable1.value, watchable2.value,
+        value, watchable4.value, watchable5.value, watchable6.value));
+    void watcher4(D value) => emit(combiner(watchable1.value, watchable2.value,
+        watchable3.value, value, watchable5.value, watchable6.value));
+    void watcher5(E value) => emit(combiner(watchable1.value, watchable2.value,
+        watchable3.value, watchable4.value, value, watchable6.value));
+    void watcher6(F value) => emit(combiner(watchable1.value, watchable2.value,
+        watchable3.value, watchable4.value, watchable5.value, value));
 
     watchable1.watch(watcher1);
     watchable2.watch(watcher2);
@@ -267,9 +300,9 @@ class _WatchableBuilderState<T> extends State<WatchableBuilder<T>> {
       }());
       shouldRebuild = true; // Default to rebuilding on error
     }
-    
+
     _value = newValue; // Always update the internal value
-    
+
     if (shouldRebuild) {
       // Only trigger setState (and rebuild) if shouldRebuild returns true
       setState(() {});
@@ -283,10 +316,11 @@ class _WatchableBuilderState<T> extends State<WatchableBuilder<T>> {
 }
 
 /// A widget that rebuilds itself based on the value of a StateWatchable.
-/// 
-/// **DEPRECATED**: Use the extension API instead. Replace `WatchableBuilder<T>(watchable: w, builder: (context, value, child) => Widget)` 
+///
+/// **DEPRECATED**: Use the extension API instead. Replace `WatchableBuilder<T>(watchable: w, builder: (context, value, child) => Widget)`
 /// with `w.build((value) => Widget)` for 70% less code.
-@Deprecated('Use the extension API: watchable.build((value) => Widget) instead. Will be removed in v5.0.0')
+@Deprecated(
+    'Use the extension API: watchable.build((value) => Widget) instead. Will be removed in v5.0.0')
 class WatchableBuilder<T> extends StatefulWidget {
   /// The watchable whose value changes will trigger rebuilds.
   final StateWatchable<T> watchable;
@@ -330,10 +364,11 @@ class WatchableBuilder<T> extends StatefulWidget {
       );
 
   /// Creates a [WatchableBuilder] from two [StateWatchable] instances and a combiner function.
-  /// 
-  /// **DEPRECATED**: Use tuple syntax instead: `(watchable1, watchable2).build((a, b) => Widget)` 
+  ///
+  /// **DEPRECATED**: Use tuple syntax instead: `(watchable1, watchable2).build((a, b) => Widget)`
   /// or `Watch.build2(watchable1, watchable2, (a, b) => Widget)` for better readability.
-  @Deprecated('Use tuple syntax: (watchable1, watchable2).build((a, b) => Widget) instead. Will be removed in v5.0.0')
+  @Deprecated(
+      'Use tuple syntax: (watchable1, watchable2).build((a, b) => Widget) instead. Will be removed in v5.0.0')
   static WatchableBuilder from2<A, B, T>({
     Key? key,
     required StateWatchable<A> watchable1,
@@ -352,10 +387,11 @@ class WatchableBuilder<T> extends StatefulWidget {
       );
 
   /// Creates a [WatchableBuilder] from three [StateWatchable] instances and a combiner function.
-  /// 
-  /// **DEPRECATED**: Use tuple syntax instead: `(watchable1, watchable2, watchable3).build((a, b, c) => Widget)` 
+  ///
+  /// **DEPRECATED**: Use tuple syntax instead: `(watchable1, watchable2, watchable3).build((a, b, c) => Widget)`
   /// or `Watch.build3(watchable1, watchable2, watchable3, (a, b, c) => Widget)` for better readability.
-  @Deprecated('Use tuple syntax: (watchable1, watchable2, watchable3).build((a, b, c) => Widget) instead. Will be removed in v5.0.0')
+  @Deprecated(
+      'Use tuple syntax: (watchable1, watchable2, watchable3).build((a, b, c) => Widget) instead. Will be removed in v5.0.0')
   static WatchableBuilder from3<A, B, C, T>({
     Key? key,
     required StateWatchable<A> watchable1,
@@ -369,16 +405,18 @@ class WatchableBuilder<T> extends StatefulWidget {
       WatchableBuilder<T>(
         key: key,
         shouldRebuild: shouldRebuild,
-        watchable: _CombineLatest3Watchable(watchable1, watchable2, watchable3, combiner),
+        watchable: _CombineLatest3Watchable(
+            watchable1, watchable2, watchable3, combiner),
         builder: builder,
         child: child,
       );
 
   /// Creates a [WatchableBuilder] from four [StateWatchable] instances and a combiner function.
-  /// 
-  /// **DEPRECATED**: Use tuple syntax instead: `(w1, w2, w3, w4).build((a, b, c, d) => Widget)` 
+  ///
+  /// **DEPRECATED**: Use tuple syntax instead: `(w1, w2, w3, w4).build((a, b, c, d) => Widget)`
   /// or `Watch.build4(w1, w2, w3, w4, (a, b, c, d) => Widget)` for better readability.
-  @Deprecated('Use tuple syntax: (w1, w2, w3, w4).build((a, b, c, d) => Widget) instead. Will be removed in v5.0.0')
+  @Deprecated(
+      'Use tuple syntax: (w1, w2, w3, w4).build((a, b, c, d) => Widget) instead. Will be removed in v5.0.0')
   static WatchableBuilder from4<A, B, C, D, T>({
     Key? key,
     required StateWatchable<A> watchable1,
@@ -393,16 +431,18 @@ class WatchableBuilder<T> extends StatefulWidget {
       WatchableBuilder<T>(
         key: key,
         shouldRebuild: shouldRebuild,
-        watchable: _CombineLatest4Watchable(watchable1, watchable2, watchable3, watchable4, combiner),
+        watchable: _CombineLatest4Watchable(
+            watchable1, watchable2, watchable3, watchable4, combiner),
         builder: builder,
         child: child,
       );
 
   /// Creates a [WatchableBuilder] from five [StateWatchable] instances and a combiner function.
-  /// 
-  /// **DEPRECATED**: Use tuple syntax instead: `(w1, w2, w3, w4, w5).build((a, b, c, d, e) => Widget)` 
+  ///
+  /// **DEPRECATED**: Use tuple syntax instead: `(w1, w2, w3, w4, w5).build((a, b, c, d, e) => Widget)`
   /// or `Watch.build5(w1, w2, w3, w4, w5, (a, b, c, d, e) => Widget)` for better readability.
-  @Deprecated('Use tuple syntax: (w1, w2, w3, w4, w5).build((a, b, c, d, e) => Widget) instead. Will be removed in v5.0.0')
+  @Deprecated(
+      'Use tuple syntax: (w1, w2, w3, w4, w5).build((a, b, c, d, e) => Widget) instead. Will be removed in v5.0.0')
   static WatchableBuilder from5<A, B, C, D, E, T>({
     Key? key,
     required StateWatchable<A> watchable1,
@@ -418,16 +458,18 @@ class WatchableBuilder<T> extends StatefulWidget {
       WatchableBuilder<T>(
         key: key,
         shouldRebuild: shouldRebuild,
-        watchable: _CombineLatest5Watchable(watchable1, watchable2, watchable3, watchable4, watchable5, combiner),
+        watchable: _CombineLatest5Watchable(watchable1, watchable2, watchable3,
+            watchable4, watchable5, combiner),
         builder: builder,
         child: child,
       );
 
   /// Creates a [WatchableBuilder] from six [StateWatchable] instances and a combiner function.
-  /// 
-  /// **DEPRECATED**: Use tuple syntax instead: `(w1, w2, w3, w4, w5, w6).build((a, b, c, d, e, f) => Widget)` 
+  ///
+  /// **DEPRECATED**: Use tuple syntax instead: `(w1, w2, w3, w4, w5, w6).build((a, b, c, d, e, f) => Widget)`
   /// or `Watch.build6(w1, w2, w3, w4, w5, w6, (a, b, c, d, e, f) => Widget)` for better readability.
-  @Deprecated('Use tuple syntax: (w1, w2, w3, w4, w5, w6).build((a, b, c, d, e, f) => Widget) instead. Will be removed in v5.0.0')
+  @Deprecated(
+      'Use tuple syntax: (w1, w2, w3, w4, w5, w6).build((a, b, c, d, e, f) => Widget) instead. Will be removed in v5.0.0')
   static WatchableBuilder from6<A, B, C, D, E, F, T>({
     Key? key,
     required StateWatchable<A> watchable1,
@@ -436,7 +478,8 @@ class WatchableBuilder<T> extends StatefulWidget {
     required StateWatchable<D> watchable4,
     required StateWatchable<E> watchable5,
     required StateWatchable<F> watchable6,
-    required T Function(A first, B second, C third, D fourth, E fifth, F sixth) combiner,
+    required T Function(A first, B second, C third, D fourth, E fifth, F sixth)
+        combiner,
     required WatchableWidgetBuilder<T> builder,
     bool Function(T previous, T current)? shouldRebuild,
     Widget? child,
@@ -444,44 +487,45 @@ class WatchableBuilder<T> extends StatefulWidget {
       WatchableBuilder<T>(
         key: key,
         shouldRebuild: shouldRebuild,
-        watchable: _CombineLatest6Watchable(watchable1, watchable2, watchable3, watchable4, watchable5, watchable6, combiner),
+        watchable: _CombineLatest6Watchable(watchable1, watchable2, watchable3,
+            watchable4, watchable5, watchable6, combiner),
         builder: builder,
         child: child,
       );
 }
 
 /// A class that allows watching and emitting values.
-/// 
+///
 /// This is the base interface for all watchable objects that can be observed
 /// for changes and maintain a replay cache of emitted values.
 abstract class Watchable<T> {
   /// Adds a watcher function that will be called whenever a new value is emitted.
-  /// 
+  ///
   /// The [watcher] function must not be null and will receive the emitted value
   /// of type [T] whenever [emit] is called.
   void watch(void Function(T) watcher);
 
   /// Removes a previously added watcher function.
-  /// 
+  ///
   /// The [watcher] must be the exact same function reference that was passed
   /// to [watch]. If the watcher is not found, this operation is a no-op.
   void unwatch(void Function(T) watcher);
 
   /// Gets the replay cache as an unmodifiable list.
-  /// 
+  ///
   /// Returns a list containing the most recently emitted values, limited by
   /// the replay buffer size specified during construction.
   List<T> get replayCache;
 
   /// Disposes the watchable by clearing watchers and replay cache.
-  /// 
+  ///
   /// After calling dispose, this watchable should not be used anymore.
   /// All watchers will be removed and the replay cache will be cleared.
   void dispose();
 }
 
 /// A concrete implementation of [Watchable] that allows emitting values.
-/// 
+///
 /// This class provides a mutable watchable that can emit values to subscribed
 /// watchers and maintains an optional replay buffer for late subscribers.
 class MutableWatchable<T> implements Watchable<T> {
@@ -498,7 +542,7 @@ class MutableWatchable<T> implements Watchable<T> {
   bool _isDisposed = false;
 
   /// Creates a [MutableWatchable] instance with an optional replay buffer size.
-  /// 
+  ///
   /// The [replay] parameter specifies how many of the most recent values
   /// should be kept in the replay cache. When a new watcher is added,
   /// it will immediately receive all values in the replay cache.
@@ -509,7 +553,7 @@ class MutableWatchable<T> implements Watchable<T> {
         _replayCache = Queue<T>();
 
   /// Emits a new value to all registered watchers.
-  /// 
+  ///
   /// The [value] will be added to the replay cache (if enabled) and then
   /// sent to all currently registered watchers. If any watcher throws an
   /// exception, it will be logged in debug mode but won't affect other watchers.
@@ -536,11 +580,11 @@ class MutableWatchable<T> implements Watchable<T> {
   }
 
   /// Adds a watcher function that will be called on value changes.
-  /// 
+  ///
   /// The [watcher] will be called immediately with any values in the replay
   /// cache, then will receive future emitted values. The same watcher function
   /// can only be registered once - duplicate registrations are ignored.
-  /// 
+  ///
   /// Throws [StateError] if this watchable has been disposed.
   @override
   void watch(void Function(T) watcher) {
@@ -565,9 +609,9 @@ class MutableWatchable<T> implements Watchable<T> {
   }
 
   /// Removes a previously registered watcher function.
-  /// 
+  ///
   /// The [watcher] must be the exact same function reference that was passed
-  /// to [watch]. If the watcher is not found or this watchable has been 
+  /// to [watch]. If the watcher is not found or this watchable has been
   /// disposed, this operation is a no-op.
   @override
   void unwatch(void Function(T) watcher) {
@@ -585,7 +629,7 @@ class MutableWatchable<T> implements Watchable<T> {
   int get watcherCount => _watchers.length;
 
   /// Disposes the watchable by clearing watchers and replay cache.
-  /// 
+  ///
   /// After calling dispose, this watchable should not be used anymore.
   /// All watchers will be removed and the replay cache will be cleared.
   /// Subsequent calls to [watch] will throw a [StateError].
@@ -625,6 +669,21 @@ class MutableStateWatchable<T> extends MutableWatchable<T>
   @override
   T get value => _value;
 
+  /// Sets the current value and emits it if changed.
+  ///
+  /// This is a convenience setter that calls [emit] internally.
+  /// Allows for direct value assignment: `watchable.value = newValue`
+  /// and compound assignments: `watchable.value += 1`
+  ///
+  /// Example:
+  /// ```dart
+  /// final counter = 0.watch;
+  /// counter.value = 5;        // Direct assignment
+  /// counter.value += 1;       // Compound assignment
+  /// counter.value++;          // Increment (for numbers)
+  /// ```
+  set value(T newValue) => emit(newValue);
+
   @override
   void emit(T value) {
     bool hasChanged = false;
@@ -641,12 +700,13 @@ class MutableStateWatchable<T> extends MutableWatchable<T>
     } catch (error, stackTrace) {
       // If comparison throws, fallback to default comparison
       assert(() {
-        debugPrint('MutableStateWatchable compare function error: $error\n$stackTrace');
+        debugPrint(
+            'MutableStateWatchable compare function error: $error\n$stackTrace');
         return true;
       }());
       hasChanged = value != _value;
     }
-    
+
     if (hasChanged) {
       _value = value;
       super.emit(value);
@@ -655,10 +715,11 @@ class MutableStateWatchable<T> extends MutableWatchable<T>
 }
 
 /// A widget that consumes values from a Watchable and triggers an event.
-/// 
-/// **DEPRECATED**: Use the extension API instead. Replace `WatchableConsumer<T>(watchable: w, onEvent: (value) => {}, child: Widget)` 
+///
+/// **DEPRECATED**: Use the extension API instead. Replace `WatchableConsumer<T>(watchable: w, onEvent: (value) => {}, child: Widget)`
 /// with `w.consume(onEvent: (value) => {}, child: Widget)` for cleaner syntax.
-@Deprecated('Use the extension API: watchable.consume(onEvent: (value) => {}, child: Widget) instead. Will be removed in v5.0.0')
+@Deprecated(
+    'Use the extension API: watchable.consume(onEvent: (value) => {}, child: Widget) instead. Will be removed in v5.0.0')
 class WatchableConsumer<T> extends StatefulWidget {
   /// The watchable to consume values from.
   final Watchable<T> watchable;
@@ -735,7 +796,7 @@ typedef WString = MutableStateWatchable<String>;
 typedef WBool = MutableStateWatchable<bool>;
 typedef WDouble = MutableStateWatchable<double>;
 typedef WList<T> = MutableStateWatchable<List<T>>;
-typedef WMap<K,V> = MutableStateWatchable<Map<K,V>>;
+typedef WMap<K, V> = MutableStateWatchable<Map<K, V>>;
 
 /// Event streams (no persistent value)
 typedef WEvent<T> = MutableWatchable<T>;
@@ -747,7 +808,7 @@ typedef WatchableEvent<T> = Watchable<T>;
 /// Extension methods to enable .watch syntax for any type
 extension WatchableExtension<T> on T {
   /// Creates a MutableStateWatchable with this value as initial value
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final counter = 0.watch;        // Creates WInt(0)
@@ -760,7 +821,7 @@ extension WatchableExtension<T> on T {
 /// Type-specific extension for integers
 extension WatchableIntExtension on int {
   /// Creates a WInt (MutableStateWatchable&lt;int&gt;) with this value
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final counter = 0.watch;  // Creates WInt(0)
@@ -772,7 +833,7 @@ extension WatchableIntExtension on int {
 /// Type-specific extension for strings
 extension WatchableStringExtension on String {
   /// Creates a WString (MutableStateWatchable&lt;String&gt;) with this value
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final name = 'John'.watch;     // Creates WString('John')
@@ -784,7 +845,7 @@ extension WatchableStringExtension on String {
 /// Type-specific extension for booleans
 extension WatchableBoolExtension on bool {
   /// Creates a WBool (MutableStateWatchable&lt;bool&gt;) with this value
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final isLoading = false.watch; // Creates WBool(false)
@@ -796,7 +857,7 @@ extension WatchableBoolExtension on bool {
 /// Type-specific extension for doubles
 extension WatchableDoubleExtension on double {
   /// Creates a WDouble (MutableStateWatchable&lt;double&gt;) with this value
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final price = 99.99.watch;     // Creates WDouble(99.99)
@@ -808,7 +869,7 @@ extension WatchableDoubleExtension on double {
 /// Type-specific extension for lists
 extension WatchableListExtension<T> on List<T> {
   /// Creates a WList (MutableStateWatchable&lt;List&lt;T&gt;&gt;) with this list
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final items = <String>[].watch; // Creates WList<String>([])
@@ -820,7 +881,7 @@ extension WatchableListExtension<T> on List<T> {
 /// Type-specific extension for maps
 extension WatchableMapExtension<K, V> on Map<K, V> {
   /// Creates a WMap (MutableStateWatchable&lt;Map&lt;K,V&gt;&gt;) with this map
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final config = <String, int>{}.watch; // Creates WMap<String, int>({})
@@ -832,23 +893,24 @@ extension WatchableMapExtension<K, V> on Map<K, V> {
 /// Widget builder extension for StateWatchable
 extension StateWatchableWidgetExtension<T> on StateWatchable<T> {
   /// Creates a WatchableBuilder with a simplified builder function
-  /// 
+  ///
   /// This is a shorthand for creating WatchableBuilder widgets.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final counter = 0.watch;
-  /// 
+  ///
   /// // Instead of:
   /// WatchableBuilder<int>(
   ///   watchable: counter,
   ///   builder: (context, value, child) => Text('$value'),
   /// )
-  /// 
+  ///
   /// // You can write:
   /// counter.build((value) => Text('$value'))
   /// ```
-  Widget build(Widget Function(T value) builder, {bool Function(T previous, T current)? shouldRebuild}) {
+  Widget build(Widget Function(T value) builder,
+      {bool Function(T previous, T current)? shouldRebuild}) {
     return WatchableBuilder<T>(
       watchable: this,
       shouldRebuild: shouldRebuild,
@@ -860,20 +922,20 @@ extension StateWatchableWidgetExtension<T> on StateWatchable<T> {
 /// Widget consumer extension for Watchable (event streams)
 extension WatchableWidgetExtension<T> on Watchable<T> {
   /// Creates a WatchableConsumer with a simplified event handler
-  /// 
+  ///
   /// This is a shorthand for creating WatchableConsumer widgets.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final notifications = WEvent<String>();
-  /// 
+  ///
   /// // Instead of:
   /// WatchableConsumer<String>(
   ///   watchable: notifications,
   ///   onEvent: (message) => showSnackBar(message),
   ///   child: MyWidget(),
   /// )
-  /// 
+  ///
   /// // You can write:
   /// notifications.consume(
   ///   onEvent: (message) => showSnackBar(message),
@@ -897,15 +959,18 @@ extension WatchableWidgetExtension<T> on Watchable<T> {
 // ============================================================================
 
 /// Extension for combining 2 StateWatchable instances
-extension StateWatchableCombiner2<A, B> on (StateWatchable<A>, StateWatchable<B>) {
+extension StateWatchableCombiner2<A, B> on (
+  StateWatchable<A>,
+  StateWatchable<B>
+) {
   /// Combines two StateWatchable instances into one
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final name = 'John'.watch;
   /// final age = 25.watch;
   /// final combined = (name, age).combine((n, a) => 'Name: $n, Age: $a');
-  /// 
+  ///
   /// combined.build((value) => Text(value))
   /// ```
   StateWatchable<R> combine<R>(R Function(A, B) combiner) {
@@ -913,15 +978,16 @@ extension StateWatchableCombiner2<A, B> on (StateWatchable<A>, StateWatchable<B>
   }
 
   /// Creates a widget that builds from the combined values
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final name = 'John'.watch;
   /// final age = 25.watch;
-  /// 
+  ///
   /// (name, age).build((n, a) => Text('Name: $n, Age: $a'))
   /// ```
-  Widget build(Widget Function(A, B) builder, {bool Function(Widget? previous, Widget current)? shouldRebuild}) {
+  Widget build(Widget Function(A, B) builder,
+      {bool Function(Widget? previous, Widget current)? shouldRebuild}) {
     return WatchableBuilder.from2<A, B, Widget>(
       watchable1: $1,
       watchable2: $2,
@@ -933,16 +999,20 @@ extension StateWatchableCombiner2<A, B> on (StateWatchable<A>, StateWatchable<B>
 }
 
 /// Extension for combining 3 StateWatchable instances
-extension StateWatchableCombiner3<A, B, C> on (StateWatchable<A>, StateWatchable<B>, StateWatchable<C>) {
+extension StateWatchableCombiner3<A, B, C> on (
+  StateWatchable<A>,
+  StateWatchable<B>,
+  StateWatchable<C>
+) {
   /// Combines three StateWatchable instances into one
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final first = 'John'.watch;
   /// final last = 'Doe'.watch;
   /// final age = 25.watch;
   /// final combined = (first, last, age).combine((f, l, a) => 'Full: $f $l ($a)');
-  /// 
+  ///
   /// combined.build((value) => Text(value))
   /// ```
   StateWatchable<R> combine<R>(R Function(A, B, C) combiner) {
@@ -950,7 +1020,8 @@ extension StateWatchableCombiner3<A, B, C> on (StateWatchable<A>, StateWatchable
   }
 
   /// Creates a widget that builds from the combined values
-  Widget build(Widget Function(A, B, C) builder, {bool Function(Widget? previous, Widget current)? shouldRebuild}) {
+  Widget build(Widget Function(A, B, C) builder,
+      {bool Function(Widget? previous, Widget current)? shouldRebuild}) {
     return WatchableBuilder.from3<A, B, C, Widget>(
       watchable1: $1,
       watchable2: $2,
@@ -963,14 +1034,20 @@ extension StateWatchableCombiner3<A, B, C> on (StateWatchable<A>, StateWatchable
 }
 
 /// Extension for combining 4 StateWatchable instances
-extension StateWatchableCombiner4<A, B, C, D> on (StateWatchable<A>, StateWatchable<B>, StateWatchable<C>, StateWatchable<D>) {
+extension StateWatchableCombiner4<A, B, C, D> on (
+  StateWatchable<A>,
+  StateWatchable<B>,
+  StateWatchable<C>,
+  StateWatchable<D>
+) {
   /// Combines four StateWatchable instances into one
   StateWatchable<R> combine<R>(R Function(A, B, C, D) combiner) {
     return _CombineLatest4Watchable($1, $2, $3, $4, combiner);
   }
 
   /// Creates a widget that builds from the combined values
-  Widget build(Widget Function(A, B, C, D) builder, {bool Function(Widget? previous, Widget current)? shouldRebuild}) {
+  Widget build(Widget Function(A, B, C, D) builder,
+      {bool Function(Widget? previous, Widget current)? shouldRebuild}) {
     return WatchableBuilder.from4<A, B, C, D, Widget>(
       watchable1: $1,
       watchable2: $2,
@@ -984,14 +1061,21 @@ extension StateWatchableCombiner4<A, B, C, D> on (StateWatchable<A>, StateWatcha
 }
 
 /// Extension for combining 5 StateWatchable instances
-extension StateWatchableCombiner5<A, B, C, D, E> on (StateWatchable<A>, StateWatchable<B>, StateWatchable<C>, StateWatchable<D>, StateWatchable<E>) {
+extension StateWatchableCombiner5<A, B, C, D, E> on (
+  StateWatchable<A>,
+  StateWatchable<B>,
+  StateWatchable<C>,
+  StateWatchable<D>,
+  StateWatchable<E>
+) {
   /// Combines five StateWatchable instances into one
   StateWatchable<R> combine<R>(R Function(A, B, C, D, E) combiner) {
     return _CombineLatest5Watchable($1, $2, $3, $4, $5, combiner);
   }
 
   /// Creates a widget that builds from the combined values
-  Widget build(Widget Function(A, B, C, D, E) builder, {bool Function(Widget? previous, Widget current)? shouldRebuild}) {
+  Widget build(Widget Function(A, B, C, D, E) builder,
+      {bool Function(Widget? previous, Widget current)? shouldRebuild}) {
     return WatchableBuilder.from5<A, B, C, D, E, Widget>(
       watchable1: $1,
       watchable2: $2,
@@ -1006,9 +1090,16 @@ extension StateWatchableCombiner5<A, B, C, D, E> on (StateWatchable<A>, StateWat
 }
 
 /// Extension for combining 6 StateWatchable instances
-extension StateWatchableCombiner6<A, B, C, D, E, F> on (StateWatchable<A>, StateWatchable<B>, StateWatchable<C>, StateWatchable<D>, StateWatchable<E>, StateWatchable<F>) {
+extension StateWatchableCombiner6<A, B, C, D, E, F> on (
+  StateWatchable<A>,
+  StateWatchable<B>,
+  StateWatchable<C>,
+  StateWatchable<D>,
+  StateWatchable<E>,
+  StateWatchable<F>
+) {
   /// Combines six StateWatchable instances into one
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final firstName = 'John'.watch;
@@ -1017,12 +1108,12 @@ extension StateWatchableCombiner6<A, B, C, D, E, F> on (StateWatchable<A>, State
   /// final email = 'john@example.com'.watch;
   /// final isActive = true.watch;
   /// final score = 95.5.watch;
-  /// 
+  ///
   /// final combined = (firstName, lastName, age, email, isActive, score).combine(
-  ///   (first, last, a, e, active, s) => 
+  ///   (first, last, a, e, active, s) =>
   ///     'User: $first $last ($a), Email: $e, Active: $active, Score: $s'
   /// );
-  /// 
+  ///
   /// combined.build((value) => Text(value))
   /// ```
   StateWatchable<R> combine<R>(R Function(A, B, C, D, E, F) combiner) {
@@ -1030,7 +1121,7 @@ extension StateWatchableCombiner6<A, B, C, D, E, F> on (StateWatchable<A>, State
   }
 
   /// Creates a widget that builds from the combined values
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final firstName = 'John'.watch;
@@ -1039,12 +1130,13 @@ extension StateWatchableCombiner6<A, B, C, D, E, F> on (StateWatchable<A>, State
   /// final email = 'john@example.com'.watch;
   /// final isActive = true.watch;
   /// final score = 95.5.watch;
-  /// 
+  ///
   /// (firstName, lastName, age, email, isActive, score).build(
   ///   (first, last, a, e, active, s) => Text('$first $last ($a)')
   /// )
   /// ```
-  Widget build(Widget Function(A, B, C, D, E, F) builder, {bool Function(Widget? previous, Widget current)? shouldRebuild}) {
+  Widget build(Widget Function(A, B, C, D, E, F) builder,
+      {bool Function(Widget? previous, Widget current)? shouldRebuild}) {
     return WatchableBuilder.from6<A, B, C, D, E, F, Widget>(
       watchable1: $1,
       watchable2: $2,
@@ -1062,16 +1154,16 @@ extension StateWatchableCombiner6<A, B, C, D, E, F> on (StateWatchable<A>, State
 /// Utility class for creating combiners with extension API
 class Watch {
   /// Combines 2 StateWatchable instances
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final name = 'John'.watch;
   /// final age = 25.watch;
-  /// 
+  ///
   /// // Create combined watchable
   /// final userInfo = Watch.combine2(name, age, (n, a) => 'Name: $n, Age: $a');
   /// userInfo.build((info) => Text(info))
-  /// 
+  ///
   /// // Or build directly
   /// Watch.build2(name, age, (n, a) => Text('Name: $n, Age: $a'))
   /// ```
@@ -1090,7 +1182,8 @@ class Watch {
     StateWatchable<C> watchable3,
     R Function(A, B, C) combiner,
   ) {
-    return _CombineLatest3Watchable(watchable1, watchable2, watchable3, combiner);
+    return _CombineLatest3Watchable(
+        watchable1, watchable2, watchable3, combiner);
   }
 
   /// Combines 4 StateWatchable instances
@@ -1101,7 +1194,8 @@ class Watch {
     StateWatchable<D> watchable4,
     R Function(A, B, C, D) combiner,
   ) {
-    return _CombineLatest4Watchable(watchable1, watchable2, watchable3, watchable4, combiner);
+    return _CombineLatest4Watchable(
+        watchable1, watchable2, watchable3, watchable4, combiner);
   }
 
   /// Combines 5 StateWatchable instances
@@ -1113,11 +1207,12 @@ class Watch {
     StateWatchable<E> watchable5,
     R Function(A, B, C, D, E) combiner,
   ) {
-    return _CombineLatest5Watchable(watchable1, watchable2, watchable3, watchable4, watchable5, combiner);
+    return _CombineLatest5Watchable(
+        watchable1, watchable2, watchable3, watchable4, watchable5, combiner);
   }
 
   /// Combines 6 StateWatchable instances
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final firstName = 'John'.watch;
@@ -1126,13 +1221,13 @@ class Watch {
   /// final email = 'john@example.com'.watch;
   /// final isActive = true.watch;
   /// final score = 95.5.watch;
-  /// 
+  ///
   /// final userProfile = Watch.combine6(
   ///   firstName, lastName, age, email, isActive, score,
-  ///   (first, last, a, e, active, s) => 
+  ///   (first, last, a, e, active, s) =>
   ///     'User: $first $last ($a), Email: $e, Active: $active, Score: $s'
   /// );
-  /// 
+  ///
   /// userProfile.build((profile) => Text(profile))
   /// ```
   static StateWatchable<R> combine6<A, B, C, D, E, F, R>(
@@ -1144,7 +1239,8 @@ class Watch {
     StateWatchable<F> watchable6,
     R Function(A, B, C, D, E, F) combiner,
   ) {
-    return _CombineLatest6Watchable(watchable1, watchable2, watchable3, watchable4, watchable5, watchable6, combiner);
+    return _CombineLatest6Watchable(watchable1, watchable2, watchable3,
+        watchable4, watchable5, watchable6, combiner);
   }
 
   /// Builds a widget from 2 StateWatchable instances
@@ -1224,7 +1320,7 @@ class Watch {
   }
 
   /// Builds a widget from 6 StateWatchable instances
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final firstName = 'John'.watch;
@@ -1233,7 +1329,7 @@ class Watch {
   /// final email = 'john@example.com'.watch;
   /// final isActive = true.watch;
   /// final score = 95.5.watch;
-  /// 
+  ///
   /// Watch.build6(firstName, lastName, age, email, isActive, score,
   ///   (first, last, a, e, active, s) => Card(
   ///     child: Column(
