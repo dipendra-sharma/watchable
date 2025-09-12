@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 
-/// Type-safe combiner for 2 watchables
+/// Type-safe combiner for 2 watchable
 class _CombineLatest2Watchable<A, B, T> extends MutableStateWatchable<T> {
   final List<Function> _unwatchFunctions = [];
 

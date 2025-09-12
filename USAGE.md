@@ -2,7 +2,7 @@
 
 **Comprehensive examples and patterns for building Flutter apps with Watchable.**
 
-> 💡 **New to Watchable?** Start with the [README](README.md) for a quick introduction.
+> **New to Watchable?** Start with the [README](README.md) for a quick introduction.
 
 This guide covers everything you need to build production Flutter apps using only `.watch` and `.value`:
 
@@ -15,7 +15,7 @@ This guide covers everything you need to build production Flutter apps using onl
 5. [Complete Widget Examples](#5-complete-widget-examples)
 6. [Real-World App Example](#6-real-world-complete-app-example)
 
-# 1. 📱 **Single Watchable UI Rendering**
+# 1. **Single Watchable UI Rendering**
 
 ### Basic Text & Widgets
 ```dart
@@ -260,7 +260,7 @@ final isDefault = false.watch;
 
 ---
 
-# 3. ⚡ **Combiner Functions (.combine) - Derived State**
+# 3. **Combiner Functions (.combine) - Derived State**
 
 ### Basic Calculations
 ```dart
@@ -370,7 +370,7 @@ formValid.build((valid) => ElevatedButton(
 
 ---
 
-# 4. 🎯 **shouldRebuild - Performance Optimization**
+# 4. **shouldRebuild - Performance Optimization**
 
 ### Expensive Widget Optimization
 ```dart
@@ -950,7 +950,7 @@ class ShoppingCart extends StatelessWidget {
 
 ---
 
-# 6. 🎪 **Real-World Complete App Example**
+# 6. **Real-World Complete App Example**
 
 ### Todo App with All Features
 ```dart
@@ -1349,32 +1349,32 @@ class Todo {
 
 ## 📋 **Complete Feature Summary**
 
-### **🎯 Two Concepts Only:**
+### **Two Concepts Only:**
 1. **`.watch`** - Create any state: `final anything = value.watch`
 2. **`.value`** - Update any state: `anything.value = newValue`
 
-### **🎨 UI Rendering (.build):**
+### **UI Rendering (.build):**
 - Single watchables: `watchable.build((value) => Widget)`
 - Multi-watchables: `(a, b, c).build((va, vb, vc) => Widget)`
 - Conditional rendering, lists, forms, complex UIs
 
-### **⚡ Derived State (.combine):**
+### **Derived State (.combine):**
 - Calculations: `(price, tax).combine((p, t) => p * t)`
 - Validations: `(email, password).combine((e, p) => isValid(e, p))`
 - Filtering: `(items, query).combine((list, q) => filter(list, q))`
 
-### **🚀 Performance (shouldRebuild):**
+### **Performance (shouldRebuild):**
 - Threshold updates: `shouldRebuild: (prev, curr) => diff(prev, curr) > 0.1`
 - Smart comparisons: Only rebuild when specific fields change
 - Expensive widget optimization
 
-### **📱 Complete Widgets:**
+### **Complete Widgets:**
 - Forms with real-time validation
 - Shopping carts with calculations
 - Todo apps with filtering
 - Any complex UI pattern
 
-**Everything uses the same `.watch` + `.value` pattern!** 🎉
+**Everything uses the same `.watch` + `.value` pattern!**
 
 ---
 

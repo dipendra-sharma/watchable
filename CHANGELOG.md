@@ -5,6 +5,17 @@ All notable changes to the `watchable` package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.1] - 2025-09-12
+
+### Fixed
+- **Documentation cleanup** - Removed all emojis from README.md and USAGE.md for cleaner, professional appearance
+- **Code warnings** - Fixed unused parameter warning in example app
+
+### Documentation
+- **Cleaner presentation** - All section headers and content now emoji-free
+- **Professional appearance** - Improved readability and accessibility
+- **Consistent formatting** - Standardized documentation style across all markdown files
+
 ## [4.1.0] - 2025-09-12
 
 ### Added

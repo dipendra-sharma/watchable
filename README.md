@@ -10,7 +10,7 @@ counter.build((count) => Text('$count'))  // UI
 
 That's it. You just learned the entire library.
 
-## ⚡ 30-Second Start
+## 30-Second Start
 
 ```yaml
 dependencies:
@@ -44,7 +44,7 @@ class CounterApp extends StatelessWidget {
 
 ---
 
-## 🎯 Why Developers Love It
+## Why Developers Love It
 
 | Old Way (Provider/Bloc/GetX) | Watchable Way |
 |------------------------------|---------------|
@@ -55,7 +55,7 @@ class CounterApp extends StatelessWidget {
 
 ---
 
-## 🚀 Real Examples
+## Real Examples
 
 ### Form Validation
 ```dart
@@ -99,7 +99,7 @@ todos.value = [...todos.value, 'New todo'];
 
 ---
 
-## 🎨 All UI Patterns
+## All UI Patterns
 
 ```dart
 // Text & Basic Widgets
@@ -120,7 +120,7 @@ items.build((list) => ListView.builder(...))
 
 ---
 
-## ⚡ Advanced Features
+## Advanced Features
 
 ### Smart Rebuilds (Performance)
 ```dart
@@ -146,7 +146,7 @@ appBar.build((name) => AppBar(title: Text(name)))
 
 ---
 
-## 🏗️ Architecture Example
+## Architecture Example
 
 ```dart
 class TodoApp {
@@ -177,18 +177,18 @@ class TodoApp {
 
 ---
 
-## 📊 Benchmarks
+## Benchmarks
 
 | Feature | Watchable | GetX | Provider | Riverpod |
 |---------|-----------|------|----------|-----------|
 | **Learning Time** | 30 seconds | 2 hours | 1 day | 2 days |
 | **Lines of Code** | 70% less | Good | Verbose | Complex |
 | **Performance** | Excellent | Good | OK | Excellent |
-| **Type Safety** | ✅ | ❌ | ✅ | ✅ |
+| **Type Safety** | Yes | No | Yes | Yes |
 
 ---
 
-## 🎓 Migration
+## Migration
 
 ### From GetX
 ```dart
@@ -220,7 +220,7 @@ counter.build((count) => Text('$count'))
 
 ---
 
-## 🔥 Why Switch?
+## Why Switch?
 
 - **Learn once, use everywhere** - Same pattern for all state
 - **Zero boilerplate** - No providers, consumers, or notifiers  
@@ -230,7 +230,7 @@ counter.build((count) => Text('$count'))
 
 ---
 
-## 📚 Complete Guide
+## Complete Guide
 
 Need more examples? Check our [comprehensive guide](USAGE.md) with:
 - Complex forms with validation
@@ -240,7 +240,7 @@ Need more examples? Check our [comprehensive guide](USAGE.md) with:
 
 ---
 
-## 💡 Pro Tips
+## Pro Tips
 
 ```dart
 // Events (no special event type needed!)
