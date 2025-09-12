@@ -319,8 +319,6 @@ class _WatchableBuilderState<T> extends State<WatchableBuilder<T>> {
 ///
 /// **DEPRECATED**: Use the extension API instead. Replace `WatchableBuilder<T>(watchable: w, builder: (context, value, child) => Widget)`
 /// with `w.build((value) => Widget)` for 70% less code.
-@Deprecated(
-    'Use the extension API: watchable.build((value) => Widget) instead. Will be removed in v5.0.0')
 class WatchableBuilder<T> extends StatefulWidget {
   /// The watchable whose value changes will trigger rebuilds.
   final StateWatchable<T> watchable;
@@ -367,8 +365,6 @@ class WatchableBuilder<T> extends StatefulWidget {
   ///
   /// **DEPRECATED**: Use tuple syntax instead: `(watchable1, watchable2).build((a, b) => Widget)`
   /// or `Watch.build2(watchable1, watchable2, (a, b) => Widget)` for better readability.
-  @Deprecated(
-      'Use tuple syntax: (watchable1, watchable2).build((a, b) => Widget) instead. Will be removed in v5.0.0')
   static WatchableBuilder from2<A, B, T>({
     Key? key,
     required StateWatchable<A> watchable1,
@@ -390,8 +386,6 @@ class WatchableBuilder<T> extends StatefulWidget {
   ///
   /// **DEPRECATED**: Use tuple syntax instead: `(watchable1, watchable2, watchable3).build((a, b, c) => Widget)`
   /// or `Watch.build3(watchable1, watchable2, watchable3, (a, b, c) => Widget)` for better readability.
-  @Deprecated(
-      'Use tuple syntax: (watchable1, watchable2, watchable3).build((a, b, c) => Widget) instead. Will be removed in v5.0.0')
   static WatchableBuilder from3<A, B, C, T>({
     Key? key,
     required StateWatchable<A> watchable1,
@@ -415,8 +409,6 @@ class WatchableBuilder<T> extends StatefulWidget {
   ///
   /// **DEPRECATED**: Use tuple syntax instead: `(w1, w2, w3, w4).build((a, b, c, d) => Widget)`
   /// or `Watch.build4(w1, w2, w3, w4, (a, b, c, d) => Widget)` for better readability.
-  @Deprecated(
-      'Use tuple syntax: (w1, w2, w3, w4).build((a, b, c, d) => Widget) instead. Will be removed in v5.0.0')
   static WatchableBuilder from4<A, B, C, D, T>({
     Key? key,
     required StateWatchable<A> watchable1,
@@ -441,8 +433,6 @@ class WatchableBuilder<T> extends StatefulWidget {
   ///
   /// **DEPRECATED**: Use tuple syntax instead: `(w1, w2, w3, w4, w5).build((a, b, c, d, e) => Widget)`
   /// or `Watch.build5(w1, w2, w3, w4, w5, (a, b, c, d, e) => Widget)` for better readability.
-  @Deprecated(
-      'Use tuple syntax: (w1, w2, w3, w4, w5).build((a, b, c, d, e) => Widget) instead. Will be removed in v5.0.0')
   static WatchableBuilder from5<A, B, C, D, E, T>({
     Key? key,
     required StateWatchable<A> watchable1,
@@ -468,8 +458,6 @@ class WatchableBuilder<T> extends StatefulWidget {
   ///
   /// **DEPRECATED**: Use tuple syntax instead: `(w1, w2, w3, w4, w5, w6).build((a, b, c, d, e, f) => Widget)`
   /// or `Watch.build6(w1, w2, w3, w4, w5, w6, (a, b, c, d, e, f) => Widget)` for better readability.
-  @Deprecated(
-      'Use tuple syntax: (w1, w2, w3, w4, w5, w6).build((a, b, c, d, e, f) => Widget) instead. Will be removed in v5.0.0')
   static WatchableBuilder from6<A, B, C, D, E, F, T>({
     Key? key,
     required StateWatchable<A> watchable1,
@@ -718,8 +706,6 @@ class MutableStateWatchable<T> extends MutableWatchable<T>
 ///
 /// **DEPRECATED**: Use the extension API instead. Replace `WatchableConsumer<T>(watchable: w, onEvent: (value) => {}, child: Widget)`
 /// with `w.consume(onEvent: (value) => {}, child: Widget)` for cleaner syntax.
-@Deprecated(
-    'Use the extension API: watchable.consume(onEvent: (value) => {}, child: Widget) instead. Will be removed in v5.0.0')
 class WatchableConsumer<T> extends StatefulWidget {
   /// The watchable to consume values from.
   final Watchable<T> watchable;

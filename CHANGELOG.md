@@ -5,6 +5,18 @@ All notable changes to the `watchable` package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.2] - 2025-09-12
+
+### Fixed
+- **Static analysis warnings** - Removed all @Deprecated annotations to eliminate deprecation warnings
+- **Clean codebase** - No more internal deprecation warnings when using WatchableBuilder and WatchableConsumer
+- **Example app warnings** - Fixed withOpacity deprecation in example app
+
+### Developer Experience
+- **Zero analysis issues** - Perfect static analysis score with no errors, warnings, or lints
+- **Cleaner development** - No more noisy deprecation warnings during development
+- **Better IDE experience** - Improved code completion and error highlighting
+
 ## [4.1.1] - 2025-09-12
 
 ### Fixed

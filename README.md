@@ -14,7 +14,7 @@ That's it. You just learned the entire library.
 
 ```yaml
 dependencies:
-  watchable: 
+  watchable: ^4.1.2
 ```
 
 ```dart
