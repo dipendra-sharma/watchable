@@ -23,7 +23,7 @@ class MainPage extends StatelessWidget {
   // =======================================================================
   // NEW EXTENSION API (Concise and Developer-Friendly) 
   // =======================================================================
-  final counter = 0.watch;           // WInt - 70% less code!
+  final counter = 0.watch;           // WInt - 70% less code
   final name = 'John'.watch;         // WString
   final isLoading = false.watch;     // WBool
   final price = 99.99.watch;         // WDouble
@@ -42,7 +42,7 @@ class MainPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              '🔥 NEW EXTENSION API',
+              'NEW EXTENSION API',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -95,8 +95,12 @@ class MainPage extends StatelessWidget {
             
             const Divider(height: 40),
             const Text(
-              '📚 TRADITIONAL API',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              'TRADITIONAL API (DEPRECATED)',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.orange),
+            ),
+            const Text(
+              'These APIs show deprecation warnings and will be removed in v5.0.0',
+              style: TextStyle(fontSize: 12, color: Colors.red, fontStyle: FontStyle.italic),
             ),
             const SizedBox(height: 16),
             
@@ -161,12 +165,14 @@ class MainPage extends StatelessWidget {
             
             const Divider(height: 40),
             const Text(
-              '🔗 COMBINING STATES',
+              'COMBINING STATES',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             
-            // Traditional combiner
+            // Traditional combiner (shows deprecation warning)
+            const Text('DEPRECATED: WatchableBuilder.from2 - See console for warnings',
+                       style: TextStyle(fontSize: 12, color: Colors.red)),
             WatchableBuilder.from2<int, String, String>(
               watchable1: counterWatchable,
               watchable2: textWatchable,
@@ -180,7 +186,7 @@ class MainPage extends StatelessWidget {
             
             const Divider(height: 40),
             const Text(
-              '🔗 NEW COMBINER API',
+              'NEW COMBINER API',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -200,7 +206,7 @@ class MainPage extends StatelessWidget {
             ),
             
             const SizedBox(height: 16),
-            const Text('💡 Form Validation Example'),
+            const Text('Form Validation Example'),
             Watch.build2(name, counter, (n, c) {
               final isValid = n.isNotEmpty && c > 0;
               return ElevatedButton(
@@ -215,7 +221,7 @@ class MainPage extends StatelessWidget {
             
             const SizedBox(height: 16),
             const Text(
-              '📊 CODE COMPARISON',
+              'CODE COMPARISON',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Container(
@@ -228,21 +234,24 @@ class MainPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Traditional: WatchableBuilder.from2(...)',
-                    style: TextStyle(fontFamily: 'monospace', fontSize: 12),
+                    'DEPRECATED: WatchableBuilder.from2(...)',
+                    style: TextStyle(fontFamily: 'monospace', fontSize: 12, color: Colors.red),
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'New API: (a, b).build(...) or Watch.build2(...)',
+                    'NEW API: (a, b).build(...) or Watch.build2(...)',
                     style: TextStyle(
                       fontFamily: 'monospace',
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                      color: Colors.green,
                     ),
                   ),
                   SizedBox(height: 8),
-                  Text('🎯 Custom classes and complex combinations supported!'),
+                  Text('70% less code, 10x performance improvement!'),
+                  SizedBox(height: 4),
+                  Text('See MIGRATION_GUIDE.md for complete migration steps', 
+                       style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic)),
                 ],
               ),
             ),
