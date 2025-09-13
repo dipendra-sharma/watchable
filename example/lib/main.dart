@@ -2,395 +2,633 @@ import 'package:flutter/material.dart';
 import 'package:watchable/watchable.dart';
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: MainPage(),
   ));
 }
 
-class MainPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
   // =======================================================================
-  // TRADITIONAL API (Verbose but Explicit)
+  // NEW CONST-COMPATIBLE WATCHABLE API
   // =======================================================================
-  final _counterWatchable = MutableStateWatchable<int>(0);
-  StateWatchable<int> get counterWatchable => _counterWatchable;
 
-  final _textWatchable = MutableStateWatchable<String>('');
-  StateWatchable<String> get textWatchable => _textWatchable;
+  // Basic const watchables - can be created as const!
+  static const counter = Watchable(0);
+  static const name = Watchable('John');
+  static const isLoading = Watchable(false);
+  static const price = Watchable(99.99);
+  static const items = Watchable<List<String>>([]);
 
-  final _eventWatchable = MutableWatchable<String>();
-  Watchable<String> get eventWatchable => _eventWatchable;
+  const MainPage({super.key});
 
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
   // =======================================================================
-  // NEW EXTENSION API (Concise and Developer-Friendly)
-  // =======================================================================
-  final counter = 0.watch; // WInt - 70% less code
-  final name = 'John'.watch; // WString
-  final isLoading = false.watch; // WBool
-  final price = 99.99.watch; // WDouble
-  final items = <String>[].watch; // WList<String>
-  final notifications = WEvent<String>(); // Event stream
+  var extensionCounter = 42.watchable;
 
-  MainPage({super.key});
+  var extensionName = 'Jane'.watchable;
+
+  var extensionPrice = 149.99.watchable;
+
+  var extensionItems = <String>['apple', 'banana'].watchable;
+
+  var extensionFlags = <String, bool>{'dark_mode': false}.watchable;
+
+  // Non-const watchables for different initial values
+  final email = const Watchable('');
+
+  final password = const Watchable('');
+
+  final status = const Watchable('Ready');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Watchable API Comparison')),
+      appBar: AppBar(
+        title: const Text('Const-Compatible Watchable Demo'),
+        backgroundColor: Colors.blue.shade600,
+        foregroundColor: Colors.white,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'NEW EXTENSION API',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+            _buildHeader('✨ NEW CONST-COMPATIBLE WATCHABLE API'),
             const SizedBox(height: 16),
-
-            // New API - Counter
-            counter.build((value) => Text(
-                  'Counter: $value',
-                  style: const TextStyle(fontSize: 24, color: Colors.blue),
-                )),
-            ElevatedButton(
-              onPressed: () => counter.emit(counter.value + 1),
-              child: const Text('Increment (New API)'),
+            _buildSection(
+              'Basic Counter Example',
+              'Direct value modification with const watchables',
+              [
+                WatchableBuilder<int>(
+                  watchable: MainPage.counter,
+                  builder: (value) => Text(
+                    'Counter: $value',
+                    style: const TextStyle(fontSize: 24, color: Colors.blue),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => MainPage.counter.value++,
+                      child: const Text('Increment'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () => MainPage.counter.value--,
+                      child: const Text('Decrement'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () => MainPage.counter.value = 0,
+                      child: const Text('Reset'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // New API - Name
-            name.build((value) => Text(
-                  'Name: $value',
-                  style: const TextStyle(fontSize: 20, color: Colors.blue),
-                )),
-            TextField(
-              onChanged: (value) => name.emit(value),
-              decoration: const InputDecoration(
-                labelText: 'Enter name (New API)',
-                border: OutlineInputBorder(),
-              ),
+            _buildSection(
+              'Name Input Example',
+              'String watchable with real-time updates',
+              [
+                WatchableBuilder<String>(
+                  watchable: MainPage.name,
+                  builder: (value) => Text(
+                    'Hello, $value!',
+                    style: const TextStyle(fontSize: 20, color: Colors.green),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  onChanged: (value) => MainPage.name.value = value,
+                  decoration: const InputDecoration(
+                    labelText: 'Enter your name',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // New API - Loading State
-            isLoading.build((loading) => loading
-                ? const CircularProgressIndicator()
-                : const Text('Ready!', style: TextStyle(color: Colors.green))),
-            ElevatedButton(
-              onPressed: () => isLoading.emit(!isLoading.value),
-              child: const Text('Toggle Loading'),
+            _buildSection(
+              'Loading State Example',
+              'Boolean watchable for state management',
+              [
+                WatchableBuilder<bool>(
+                  watchable: MainPage.isLoading,
+                  builder: (loading) => loading
+                      ? const Column(
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(height: 8),
+                            Text('Loading...'),
+                          ],
+                        )
+                      : const Text(
+                          '✅ Ready!',
+                          style: TextStyle(fontSize: 18, color: Colors.green),
+                        ),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () =>
+                      MainPage.isLoading.value = !MainPage.isLoading.value,
+                  child: const Text('Toggle Loading'),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // New API - Price
-            price.build((value) => Text(
-                  'Price: \$${value.toStringAsFixed(2)}',
-                  style: const TextStyle(fontSize: 18, color: Colors.green),
-                )),
-            ElevatedButton(
-              onPressed: () => price.emit(price.value - 10),
-              child: const Text('Discount \$10'),
+            _buildSection(
+              'Price Calculator',
+              'Double watchable with formatting',
+              [
+                WatchableBuilder<double>(
+                  watchable: MainPage.price,
+                  builder: (value) => Text(
+                    'Price: \$${value.toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 18, color: Colors.orange),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => MainPage.price.value += 10,
+                      child: const Text('+\$10'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () => MainPage.price.value -= 10,
+                      child: const Text('-\$10'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () => MainPage.price.value = 99.99,
+                      child: const Text('Reset'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-
-            const Divider(height: 40),
-            const Text(
-              'NEW .value SETTER SYNTAX',
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.purple),
+            _buildHeader('🔄 TRANSFORMATION FUNCTIONS'),
+            _buildSection(
+              'Map Transformation',
+              'Transform values with map() function',
+              [
+                WatchableBuilder<String>(
+                  watchable: MainPage.counter.map((value) =>
+                      'Count: $value (${value.isEven ? 'Even' : 'Odd'})'),
+                  builder: (value) => Text(
+                    value,
+                    style: const TextStyle(fontSize: 16, color: Colors.purple),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Demonstrate the CounterState pattern
-            _CounterStateDemo(),
-
-            const Divider(height: 40),
-            const Text(
-              'TRADITIONAL API (DEPRECATED)',
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.orange),
+            _buildSection(
+              'Where Filter',
+              'Filter values with where() function',
+              [
+                WatchableBuilder<int>(
+                  watchable: MainPage.counter.where((value) => value >= 0),
+                  builder: (value) => Text(
+                    'Positive Counter: $value',
+                    style: const TextStyle(fontSize: 16, color: Colors.teal),
+                  ),
+                ),
+              ],
             ),
-            const Text(
-              'These APIs show deprecation warnings and will be removed in v5.0.0',
-              style: TextStyle(
-                  fontSize: 12, color: Colors.red, fontStyle: FontStyle.italic),
+            _buildSection(
+              'Distinct Values',
+              'Remove duplicates with distinct() function',
+              [
+                WatchableBuilder<int>(
+                  watchable: MainPage.counter.distinct(),
+                  builder: (value) => Text(
+                    'Distinct Counter: $value',
+                    style: const TextStyle(fontSize: 16, color: Colors.indigo),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Traditional API - Counter
-            WatchableBuilder<int>(
-              watchable: counterWatchable,
-              builder: (context, value, child) {
-                return Text('Traditional Counter: $value',
-                    style: const TextStyle(fontSize: 18, color: Colors.orange));
-              },
+            _buildHeader('🎯 .watchable EXTENSION EXAMPLES'),
+            _buildSection(
+              'Extension Counter Example',
+              'Using .watchable syntax with specialized methods',
+              [
+                WatchableBuilder<int>(
+                  watchable: extensionCounter,
+                  builder: (value) => Text(
+                    'Extension Counter: $value',
+                    style: const TextStyle(fontSize: 24, color: Colors.purple),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => extensionCounter.increment(),
+                      child: const Text('++'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () => extensionCounter.decrement(),
+                      child: const Text('--'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () => extensionCounter.value = 42,
+                      child: const Text('Reset to 42'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () =>
-                  _counterWatchable.emit(counterWatchable.value + 1),
-              child: const Text('Increment (Traditional)'),
+            _buildSection(
+              'Extension Collections',
+              'List and Map extensions with specialized methods',
+              [
+                WatchableBuilder<List<String>>(
+                  watchable: extensionItems,
+                  builder: (items) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Items (${items.length}): ${items.join(', ')}',
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.indigo),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => extensionItems.add('orange'),
+                            child: const Text('Add Orange'),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () => extensionItems.remove('apple'),
+                            child: const Text('Remove Apple'),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () => extensionItems.clear(),
+                            child: const Text('Clear'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Traditional API - Text
-            WatchableBuilder<String>(
-              watchable: textWatchable,
-              builder: (context, value, child) {
-                return Text('Traditional Text: $value',
-                    style: const TextStyle(fontSize: 16, color: Colors.orange));
-              },
+            _buildSection(
+              'Extension Map Example',
+              'Map watchable with toggle functionality',
+              [
+                WatchableBuilder<Map<String, bool>>(
+                  watchable: extensionFlags,
+                  builder: (flags) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Flags: ${flags.entries.map((e) => '${e.key}: ${e.value}').join(', ')}',
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.teal),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => extensionFlags.toggle('dark_mode'),
+                            child: const Text('Toggle Dark Mode'),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () =>
+                                extensionFlags.add('notifications', true),
+                            child: const Text('Add Notifications'),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () => extensionFlags.clear(),
+                            child: const Text('Clear All'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            TextField(
-              onChanged: (value) => _textWatchable.emit(value),
-              decoration: const InputDecoration(
-                labelText: 'Enter text (Traditional)',
-                border: OutlineInputBorder(),
-              ),
+            _buildHeader('🔗 COMBINER EXAMPLES'),
+            _buildSection(
+              'Two Watchables Combined',
+              'Combine multiple watchables with WatchableCombined2',
+              [
+                WatchableBuilder<String>(
+                  watchable: WatchableCombined2(MainPage.name, MainPage.counter,
+                      (n, c) => '$n has clicked $c times'),
+                  builder: (value) => Text(
+                    value,
+                    style: const TextStyle(fontSize: 16, color: Colors.brown),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Event Consumer (Traditional)
-            WatchableConsumer<String>(
-              watchable: eventWatchable,
-              onEvent: (value) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Event: $value')),
-                );
-              },
-              child: ElevatedButton(
-                onPressed: () => _eventWatchable.emit('Traditional event!'),
-                child: const Text('Trigger Event (Traditional)'),
-              ),
+            _buildSection(
+              'Three Watchables Combined',
+              'Advanced combination with multiple states',
+              [
+                WatchableBuilder<String>(
+                  watchable: WatchableCombined3(
+                      MainPage.name,
+                      MainPage.counter,
+                      MainPage.isLoading,
+                      (n, c, loading) => loading
+                          ? 'Loading...'
+                          : '$n: $c clicks, Price: \$${MainPage.price.value.toStringAsFixed(2)}'),
+                  builder: (value) => Text(
+                    value,
+                    style: const TextStyle(fontSize: 16, color: Colors.red),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-
-            // Event Consumer (New API)
-            notifications.consume(
-              onEvent: (value) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('New API Event: $value')),
-                );
-              },
-              child: ElevatedButton(
-                onPressed: () => notifications.emit('New API event!'),
-                child: const Text('Trigger Event (New API)'),
-              ),
-            ),
-
-            const Divider(height: 40),
-            const Text(
-              'COMBINING STATES',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-
-            // Traditional combiner (shows deprecation warning)
-            const Text(
-                'DEPRECATED: WatchableBuilder.from2 - See console for warnings',
-                style: TextStyle(fontSize: 12, color: Colors.red)),
-            WatchableBuilder.from2<int, String, String>(
-              watchable1: counterWatchable,
-              watchable2: textWatchable,
-              combiner: (count, text) =>
-                  'Traditional: Count=$count, Text="$text"',
-              builder: (context, value, child) {
-                return Text(value, style: const TextStyle(fontSize: 14));
-              },
-            ),
-
-            const SizedBox(height: 16),
-
-            const Divider(height: 40),
-            const Text(
-              'NEW COMBINER API',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-
-            // Tuple combiner demo
-            (name, isLoading).build((n, loading) => loading
-                ? const Text('Loading...',
-                    style: TextStyle(color: Colors.orange))
-                : Text('Hello $n!',
-                    style: const TextStyle(fontSize: 18, color: Colors.green))),
-
-            const SizedBox(height: 16),
-
-            // Watch.build2 demo
-            Watch.build2(
-                counter,
-                price,
-                (c, p) =>
-                    Text('Items: $c, Total: \$${(c * p).toStringAsFixed(2)}')),
-
-            const SizedBox(height: 16),
-            const Text('Form Validation Example'),
-            Watch.build2(name, counter, (n, c) {
-              final isValid = n.isNotEmpty && c > 0;
-              return ElevatedButton(
-                onPressed: isValid
-                    ? () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text('Form valid! Name: $n, Count: $c')),
-                        );
+            _buildHeader('🎯 FORM VALIDATION EXAMPLE'),
+            _buildSection(
+              'Login Form',
+              'Real-world form validation with combined watchables',
+              [
+                TextField(
+                  onChanged: (value) => email.value = value,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  onChanged: (value) => password.value = value,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                WatchableBuilder<String>(
+                  watchable: WatchableCombined2(
+                    email,
+                    password,
+                    (e, p) {
+                      if (e.isEmpty) return 'Please enter email';
+                      if (!e.contains('@')) return 'Invalid email format';
+                      if (p.isEmpty) return 'Please enter password';
+                      if (p.length < 6) {
+                        return 'Password must be at least 6 characters';
                       }
-                    : null,
-                child: Text(isValid ? 'Valid Form' : 'Invalid Form'),
-              );
-            }),
-
-            const SizedBox(height: 16),
-            const Text(
-              'CODE COMPARISON',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      return 'Valid';
+                    },
+                  ),
+                  builder: (validation) {
+                    final isValid = validation == 'Valid';
+                    return Column(
+                      children: [
+                        Text(
+                          validation,
+                          style: TextStyle(
+                            color: isValid ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: isValid
+                              ? () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            'Login successful for ${email.value}!')),
+                                  );
+                                }
+                              : null,
+                          child: const Text('Login'),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
+            _buildHeader('🔔 ALWAYS NOTIFY FEATURE'),
+            _buildSection(
+              'Force Notifications on Identical Values',
+              'Control whether identical value assignments trigger listeners',
+              [
+                WatchableBuilder<String>(
+                  watchable: status,
+                  builder: (value) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Status: $value',
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.blue),
+                      ),
+                      Text(
+                        'Always Notify: ${status.isAlwaysNotifying ? "ON" : "OFF"}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: status.isAlwaysNotifying
+                              ? Colors.green
+                              : Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => status.value = 'Ready',
+                      child: const Text('Set "Ready"'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () => status.refresh(),
+                      child: const Text('Refresh'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => status.alwaysNotify(
+                          enabled: !status.isAlwaysNotifying),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: status.isAlwaysNotifying
+                            ? Colors.red
+                            : Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Text(status.isAlwaysNotifying
+                          ? 'Disable Always Notify'
+                          : 'Enable Always Notify'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  '💡 Try: Enable "Always Notify", then click "Set Ready" multiple times. '
+                  'Each click will trigger a rebuild even with the same value!',
+                  style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                ),
+              ],
+            ),
+            _buildHeader('📊 shouldRebuild OPTIMIZATION'),
+            _buildSection(
+              'Optimized Rebuilds',
+              'Using shouldRebuild to control when widgets update',
+              [
+                WatchableBuilder<int>(
+                  watchable: MainPage.counter,
+                  shouldRebuild: (previous, current) => current % 5 == 0,
+                  builder: (value) => Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'Only updates every 5 clicks: $value',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            _buildHeader('💡 API BENEFITS & COMPARISON'),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: Colors.green.shade50,
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.green.shade200),
               ),
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'DEPRECATED: WatchableBuilder.from2(...)',
-                    style: TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 12,
-                        color: Colors.red),
+                    '✅ Const Watchable API Benefits:',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'NEW API: (a, b).build(...) or Watch.build2(...)',
-                    style: TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
+                      '• const counter = Watchable(0) - compile-time optimization'),
+                  Text('• Built on Flutter\'s proven ValueNotifier foundation'),
+                  Text('• Direct value modification: counter.value++'),
+                  Text('• Type-safe combiners and transformations'),
+                  SizedBox(height: 12),
+                  Text(
+                    '🚀 Extension .watchable API Benefits:',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
-                  Text('70% less code, 10x performance improvement!'),
-                  SizedBox(height: 4),
-                  Text('See MIGRATION_GUIDE.md for complete migration steps',
-                      style:
-                          TextStyle(fontSize: 11, fontStyle: FontStyle.italic)),
+                  Text('• final counter = 0.watchable - even more concise'),
+                  Text(
+                      '• Specialized methods: increment(), toggle(), add(), clear()'),
+                  Text('• Type inference: no need to specify <T>'),
+                  Text('• Collection helpers: items.add(), flags.toggle()'),
+                  SizedBox(height: 12),
+                  Text(
+                    '⚡ Overall Benefits:',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                      '• 70% less boilerplate than traditional state management'),
+                  Text('• shouldRebuild optimization for performance'),
+                  Text('• alwaysNotify() for forced updates when needed'),
+                  Text('• refresh() method for one-time forced notifications'),
+                  Text('• Deep collection equality with smart comparison'),
+                  Text('• No global state complexity'),
                 ],
               ),
             ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
     );
   }
-}
 
-/// Demo widget showing the new .value setter syntax
-class _CounterStateDemo extends StatelessWidget {
-  // This is the pattern the user requested
-  final counterState = _CounterState();
+  Widget _buildHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      ),
+    );
+  }
 
-  _CounterStateDemo();
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildSection(String title, String subtitle, List<Widget> children) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 24),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.purple.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'CounterState Pattern with .value setter:',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: const Text(
-              '''class CounterState {
-  final counter = 0.watch;
-  
-  void increment() {
-    counter.value += 1;  // Direct modification!
-  }
-}''',
-              style: TextStyle(fontFamily: 'monospace', fontSize: 12),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 16),
-
-          // Display current value
-          counterState.counter.build((value) => Text(
-                'Count: $value',
-                style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.purple),
-              )),
-
-          const SizedBox(height: 16),
-
-          // Control buttons
-          Wrap(
-            spacing: 8,
-            children: [
-              ElevatedButton(
-                onPressed: counterState.increment,
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                child: const Text('++ Increment'),
-              ),
-              ElevatedButton(
-                onPressed: counterState.decrement,
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text('-- Decrement'),
-              ),
-              ElevatedButton(
-                onPressed: counterState.reset,
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
-                child: const Text('Reset'),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 8),
-          const Text(
-            'Notice: No .emit() calls needed! Direct value modification with +=, -=, etc.',
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
             style: TextStyle(
-                fontSize: 12, fontStyle: FontStyle.italic, color: Colors.grey),
+              fontSize: 14,
+              color: Colors.grey.shade600,
+              fontStyle: FontStyle.italic,
+            ),
           ),
+          const SizedBox(height: 12),
+          ...children,
         ],
       ),
     );
   }
 }
 
-/// Example state class showing the new .value setter pattern
-class _CounterState {
-  final counter = 0.watch;
+/// Example of the CounterState pattern for encapsulated state management
+class CounterState {
+  static const _counter = Watchable(0);
 
-  void increment() {
-    counter.value +=
-        1; // Direct modification instead of emit(counter.value + 1)
-  }
+  // Public read-only access
+  AbstractWatchable<int> get counter => _counter;
 
-  void decrement() {
-    counter.value -= 1; // Works with all arithmetic operators
-  }
-
-  void reset() {
-    counter.value = 0; // Direct assignment
-  }
+  // State modification methods
+  void increment() => _counter.value++;
+  void decrement() => _counter.value--;
+  void reset() => _counter.value = 0;
+  void addValue(int value) => _counter.value += value;
 }
