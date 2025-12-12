@@ -14,7 +14,7 @@ That's it. You just learned the entire library.
 
 ```yaml
 dependencies:
-  watchable: ^5.0.0
+  watchable: ^6.0.0
 ```
 
 ```dart
@@ -127,17 +127,19 @@ items.build((list) => ListView.builder(...))
 
 ## Advanced Features
 
-### Deep Collection Equality
+### O(1) Identical Comparison
 ```dart
-// Nested collections are compared deeply
-final users = [User(name: 'John', tags: ['dev', 'flutter'])].watchable;
+// v6.0.0 uses identical() for maximum performance
+final users = [User(name: 'John')].watchable;
 
-// Only triggers rebuild when actual content changes
-users.value = [User(name: 'John', tags: ['dev', 'flutter'])];
-// ↑ No rebuild - same content
+// Only triggers rebuild when object reference changes
+final sameList = users.value;
+users.value = sameList;  // No rebuild - same reference
 
-users.value = [User(name: 'Jane', tags: ['dev', 'flutter'])];
-// ↑ Rebuilds - different content
+users.value = [User(name: 'John')];  // Rebuilds - new reference
+
+// For deep equality comparison, use watchable_redux with deepEquals:
+// final store = Store(initialState: state, reducer: r, equals: deepEquals);
 ```
 
 ### Smart Rebuilds (Performance)
@@ -328,21 +330,6 @@ class TodoApp {
 
 ---
 
-## Benchmarks
-
-| Feature                   | Watchable          | GetX    | Provider | Riverpod  |
-|---------------------------|--------------------|---------|----------|-----------|
-| **Learning Time**         | 30 seconds         | 2 hours | 1 day    | 2 days    |
-| **Lines of Code**         | 70% less           | Good    | Verbose  | Complex   |
-| **Performance**           | Excellent          | Good    | OK       | Excellent |
-| **Type Safety**           | Yes                | No      | Yes      | Yes       |
-| **Deep Equality**         | Yes                | No      | No       | No        |
-| **Transformations**       | map/where/distinct | No      | Manual   | Limited   |
-| **Multi-State Combining** | (a,b,c).build()    | Manual  | Complex  | Good      |
-| **Test Coverage**         | 152 tests          | Good    | Basic    | Good      |
-
----
-
 ## Migration
 
 ### From GetX
@@ -381,23 +368,13 @@ counter.build((count) => Text('$count'))
 - **Zero boilerplate** - No providers, consumers, or notifiers
 - **Automatic optimization** - Built-in performance features
 - **Type safe** - Compile-time error catching
-- **Deep collection equality** - Smart comparison for Lists, Maps, Sets
+- **O(1) identical() comparison** - Maximum performance with immutable patterns
 - **Functional transformations** - Built-in map, where, distinct operations
 - **Multi-state combining** - Tuple syntax for 2-6 watchable
 - **Type-specific shortcuts** - increment(), toggle(), add(), clear()
 - **Bulletproof reliability** - 152 comprehensive tests, 100% success rate
 - **Production ready** - Advanced error handling and memory management
 - **Tiny size** - Single import, lightweight
-
----
-
-## Complete Guide
-
-Need more examples? Check our [comprehensive guide](USAGE.md) with:
-- Complex forms with validation
-- Shopping cart with calculations  
-- Real-time chat interfaces
-- Performance optimization tips
 
 ---
 
