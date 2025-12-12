@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:collection/collection.dart';
 
 // ============================================================================
 // TYPE ALIASES FOR CONVENIENCE
@@ -42,7 +41,7 @@ class _ForceNotifyValueNotifier<T> extends ValueNotifier<T> {
   }
 }
 
-/// Base interface for all watchable objects - supports const construction
+/// Base interface for all watchable objects
 abstract class AbstractWatchable<T> {
   const AbstractWatchable();
 
@@ -65,74 +64,41 @@ abstract class AbstractWatchable<T> {
       _DistinctWatchable(this, equals);
 }
 
-/// Const-compatible watchable for primitive values
+/// High-performance reactive state container with direct field storage.
+///
+/// [Watchable] provides O(1) updates using `identical()` comparison,
+/// optimized for immutable state patterns like Redux.
+///
+/// Example:
+/// ```dart
+/// final counter = Watchable<int>(0);
+/// final name = 'John'.watchable;
+///
+/// counter.value = 1;  // Direct field access, no Map lookup
+/// counter.build((v) => Text('$v'));
+/// ```
 class Watchable<T> extends AbstractWatchable<T> {
-  final T _defaultValue;
+  final _ForceNotifyValueNotifier<T> _notifier;
+  bool _alwaysNotify = false;
 
-  const Watchable(this._defaultValue);
-
-  // Each WatchableValue creates its own ValueNotifier when first accessed
-  // This maintains const construction while providing mutable behavior
-  static final Map<Watchable, _ForceNotifyValueNotifier> _notifiers = {};
-
-  // Track instances that should always notify, even for identical values
-  static final Set<Watchable> _alwaysNotifyInstances = {};
+  Watchable(T initialValue)
+      : _notifier = _ForceNotifyValueNotifier<T>(initialValue);
 
   @override
-  ValueNotifier<T> get notifier {
-    final existing = _notifiers[this];
-    if (existing != null) {
-      return existing as ValueNotifier<T>;
-    }
-    final newNotifier = _ForceNotifyValueNotifier<T>(_defaultValue);
-    _notifiers[this] = newNotifier;
-    return newNotifier;
-  }
+  @pragma('vm:prefer-inline')
+  ValueNotifier<T> get notifier => _notifier;
 
+  @override
+  @pragma('vm:prefer-inline')
+  T get value => _notifier.value;
+
+  @pragma('vm:prefer-inline')
   set value(T newValue) {
-    // Check if this instance should always notify
-    if (_alwaysNotifyInstances.contains(this)) {
-      final currentValue = notifier.value;
-      final isEqual = _areEqual(currentValue, newValue);
-
-      if (isEqual) {
-        // Values are equal - force notification without changing value
-        (notifier as _ForceNotifyValueNotifier<T>).forceNotify();
-      } else {
-        // Values are different - normal assignment will trigger notification
-        notifier.value = newValue;
-      }
+    if (identical(_notifier.value, newValue)) {
+      if (_alwaysNotify) _notifier.forceNotify();
       return;
     }
-
-    // Smart equality checking for collections and objects
-    if (_areEqual(notifier.value, newValue)) return;
-    notifier.value = newValue;
-  }
-
-  /// Deep equality checking for collections and objects
-  static bool _areEqual<T>(T oldValue, T newValue) {
-    if (identical(oldValue, newValue)) return true;
-    if (oldValue == null || newValue == null) return oldValue == newValue;
-
-    try {
-      // Use collection package for deep equality of Lists and Maps
-      if (oldValue is List && newValue is List) {
-        return const DeepCollectionEquality().equals(oldValue, newValue);
-      }
-      if (oldValue is Map && newValue is Map) {
-        return const DeepCollectionEquality().equals(oldValue, newValue);
-      }
-      if (oldValue is Set && newValue is Set) {
-        return const DeepCollectionEquality().equals(oldValue, newValue);
-      }
-
-      // Fallback to == operator for other types
-      return oldValue == newValue;
-    } catch (e) {
-      // If comparison fails, assume they're different
-      return false;
-    }
+    _notifier.value = newValue;
   }
 
   void emit(T newValue) => value = newValue;
@@ -140,22 +106,14 @@ class Watchable<T> extends AbstractWatchable<T> {
   /// Configure this watchable to always notify listeners, even when setting identical values
   /// This is useful for cases where you need to trigger updates regardless of value equality
   /// (e.g., refresh operations, forced rebuilds, etc.)
-  void alwaysNotify({required bool enabled}) {
-    if (enabled) {
-      _alwaysNotifyInstances.add(this);
-    } else {
-      _alwaysNotifyInstances.remove(this);
-    }
-  }
+  void alwaysNotify({required bool enabled}) => _alwaysNotify = enabled;
 
   /// Force emit the current value, triggering all listeners regardless of equality
   /// This is a one-time operation and doesn't change the ongoing notification behavior
-  void refresh() {
-    (notifier as _ForceNotifyValueNotifier<T>).forceNotify();
-  }
+  void refresh() => _notifier.forceNotify();
 
   /// Check if this watchable is configured to always notify on value changes
-  bool get isAlwaysNotifying => _alwaysNotifyInstances.contains(this);
+  bool get isAlwaysNotifying => _alwaysNotify;
 }
 
 // ============================================================================
@@ -252,7 +210,7 @@ class _DistinctWatchable<T> extends AbstractWatchable<T> {
   }
 }
 
-/// Const-compatible combiner for 2 watchable
+/// Combiner for 2 watchables
 class WatchableCombined2<A, B, R> extends AbstractWatchable<R> {
   final AbstractWatchable<A> _watchable1;
   final AbstractWatchable<B> _watchable2;
@@ -278,7 +236,7 @@ class WatchableCombined2<A, B, R> extends AbstractWatchable<R> {
   }
 }
 
-/// Const-compatible combiner for 3 watchable
+/// Combiner for 3 watchables
 class WatchableCombined3<A, B, C, R> extends AbstractWatchable<R> {
   final AbstractWatchable<A> _watchable1;
   final AbstractWatchable<B> _watchable2;
@@ -308,7 +266,7 @@ class WatchableCombined3<A, B, C, R> extends AbstractWatchable<R> {
   }
 }
 
-/// Const-compatible combiner for 4 watchable
+/// Combiner for 4 watchables
 class WatchableCombined4<A, B, C, D, R> extends AbstractWatchable<R> {
   final AbstractWatchable<A> _watchable1;
   final AbstractWatchable<B> _watchable2;
@@ -340,7 +298,7 @@ class WatchableCombined4<A, B, C, D, R> extends AbstractWatchable<R> {
   }
 }
 
-/// Const-compatible combiner for 5 watchable
+/// Combiner for 5 watchables
 class WatchableCombined5<A, B, C, D, E, R> extends AbstractWatchable<R> {
   final AbstractWatchable<A> _watchable1;
   final AbstractWatchable<B> _watchable2;
@@ -374,7 +332,7 @@ class WatchableCombined5<A, B, C, D, E, R> extends AbstractWatchable<R> {
   }
 }
 
-/// Const-compatible combiner for 6 watchable
+/// Combiner for 6 watchables
 class WatchableCombined6<A, B, C, D, E, F, R> extends AbstractWatchable<R> {
   final AbstractWatchable<A> _watchable1;
   final AbstractWatchable<B> _watchable2;

@@ -5,6 +5,33 @@ All notable changes to the `watchable` package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.0] - 2025-12-12
+
+### BREAKING CHANGES
+- **Removed `const` constructor** - `Watchable` no longer supports const construction
+- **Removed `WatchableConfig`** - Fast mode is now the default and only mode
+- **Removed `FastWatchable`** - Optimizations merged into `Watchable` class
+- **Removed `.fastWatchable` extension** - Use `.watchable` instead
+- **Removed `collection` dependency** - Deep equality no longer used
+
+### Performance (6x Faster)
+- Direct field storage for notifier (no static Map lookup)
+- O(1) equality using `identical()` only
+- `@pragma('vm:prefer-inline')` for hot paths
+- Benchmarks: ~10.6M ops/sec with 100 listeners (vs ~1.8M in v5.0.0)
+
+### Migration Guide
+```dart
+// Before (v5.x)
+const counter = Watchable<int>(0);  // No longer supported
+
+// After (v6.0.0)
+final counter = Watchable<int>(0);  // Works
+final counter = 0.watchable;        // Works
+```
+
+All other APIs unchanged: `value`, `emit()`, `refresh()`, `alwaysNotify()`, `.watchable`, `WatchableBuilder`, tuple extensions, `Watch.build2()`-`Watch.build6()`.
+
 ## [5.0.0] - 2025-09-13
 
 ### Added

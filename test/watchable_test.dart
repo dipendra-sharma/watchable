@@ -27,7 +27,7 @@ class User {
 
 // Test class for CounterState pattern testing
 class CounterState {
-  final counter = const Watchable(0);
+  final counter = Watchable(0);
 
   void increment() {
     counter.value += 1;
@@ -47,13 +47,13 @@ enum Status { pending, active, inactive }
 
 // Helper test class for const construction testing
 class _TestState {
-  static const defaultCounter = Watchable(0);
-  final counter = const Watchable(100);
+  static final defaultCounter = Watchable(0);
+  final counter = Watchable(100);
 }
 
 // Helper test class for CounterState pattern testing
 class _TestCounterState {
-  final counter = const Watchable(0);
+  final counter = Watchable(0);
 
   void increment() {
     counter.value += 1;
@@ -69,17 +69,17 @@ class _TestCounterState {
 }
 
 void main() {
-  group('Const Construction', () {
-    test('const watchable can be created', () {
-      const watchable = Watchable(42);
+  group('Basic Construction', () {
+    test('watchable can be created', () {
+      final watchable = Watchable(42);
       expect(watchable, isA<Watchable<int>>());
     });
 
-    test('const watchable with different types', () {
-      const intWatchable = Watchable(42);
-      const stringWatchable = Watchable('test');
-      const boolWatchable = Watchable(true);
-      const doubleWatchable = Watchable(3.14);
+    test('watchable with different types', () {
+      final intWatchable = Watchable(42);
+      final stringWatchable = Watchable('test');
+      final boolWatchable = Watchable(true);
+      final doubleWatchable = Watchable(3.14);
 
       expect(intWatchable, isA<Watchable<int>>());
       expect(stringWatchable, isA<Watchable<String>>());
@@ -87,42 +87,28 @@ void main() {
       expect(doubleWatchable, isA<Watchable<double>>());
     });
 
-    test('const watchable provides default value', () {
-      const watchable = Watchable(100);
+    test('watchable provides initial value', () {
+      final watchable = Watchable(100);
       expect(watchable.value, 100);
     });
 
-    test('const watchables with same value share state (by design)', () {
-      const watchable1 = Watchable(42);
-      const watchable2 = Watchable(42);
+    test('watchables with same initial value are independent instances', () {
+      final watchable1 = Watchable(42);
+      final watchable2 = Watchable(42);
 
-      // Due to const canonicalization, these are identical instances
-      expect(identical(watchable1, watchable2), true);
+      // Each Watchable is an independent instance
+      expect(identical(watchable1, watchable2), false);
 
-      // Therefore they share state (which is correct for const behavior)
+      // Changing one does not affect the other
       watchable1.value = 100;
-      expect(
-          watchable2.value, 100); // Should be the same since they're identical
-
-      // Reset for other tests
-      watchable1.value = 42;
+      expect(watchable1.value, 100);
+      expect(watchable2.value, 42); // Unchanged
     });
   });
 
   group('Basic Watchable Functionality', () {
-    // Reset commonly used const values before each test
-    setUp(() {
-      const Watchable(0).value = 0;
-      const Watchable(5).value = 5;
-      const Watchable(10).value = 10;
-      const Watchable(42).value = 42;
-      const Watchable('test').value = 'test';
-      const Watchable(7777).value = 7777;
-      const Watchable(6666).value = 6666;
-    });
-
     test('value can be read and written', () {
-      const watchable = Watchable(7777); // Unique value to avoid test conflicts
+      final watchable = Watchable(7777); // Unique value to avoid test conflicts
       expect(watchable.value, 7777);
 
       watchable.value = 8888;
@@ -130,26 +116,26 @@ void main() {
     });
 
     test('emit method works', () {
-      const watchable = Watchable(6666); // Unique value
+      final watchable = Watchable(6666); // Unique value
       watchable.emit(4242);
       expect(watchable.value, 4242);
     });
 
     test('notifier provides ValueNotifier', () {
-      const watchable = Watchable(5);
+      final watchable = Watchable(5);
       expect(watchable.notifier, isA<ValueNotifier<int>>());
       expect(watchable.notifier.value, 5);
     });
 
     test('notifier is consistent across accesses', () {
-      const watchable = Watchable('test');
+      final watchable = Watchable('test');
       final notifier1 = watchable.notifier;
       final notifier2 = watchable.notifier;
       expect(identical(notifier1, notifier2), true);
     });
 
     test('value changes notify listeners', () {
-      const watchable = Watchable(0);
+      final watchable = Watchable(0);
       int receivedValue = -1;
       bool wasNotified = false;
 
@@ -164,7 +150,7 @@ void main() {
     });
 
     test('multiple listeners receive notifications', () {
-      const watchable = Watchable(0);
+      final watchable = Watchable(0);
       int listener1Value = -1;
       int listener2Value = -1;
       bool listener1Called = false;
@@ -189,7 +175,7 @@ void main() {
     });
 
     test('compound assignments work', () {
-      const watchable = Watchable(10);
+      final watchable = Watchable(10);
 
       watchable.value += 5;
       expect(watchable.value, 15);
@@ -205,7 +191,7 @@ void main() {
     });
 
     test('string concatenation works', () {
-      const watchable = Watchable('Hello');
+      final watchable = Watchable('Hello');
       watchable.value += ' World';
       expect(watchable.value, 'Hello World');
     });
@@ -232,7 +218,7 @@ void main() {
     });
 
     test('list values work', () {
-      const watchable = Watchable<List<int>>([]);
+      final watchable = Watchable<List<int>>([]);
       expect(watchable.value, []);
 
       watchable.value = [1, 2, 3];
@@ -245,7 +231,7 @@ void main() {
     });
 
     test('map values work', () {
-      const watchable = Watchable<Map<String, int>>({});
+      final watchable = Watchable<Map<String, int>>({});
       expect(watchable.value, {});
 
       watchable.value = {'a': 1, 'b': 2};
@@ -255,8 +241,8 @@ void main() {
 
   group('CounterState Pattern', () {
     setUp(() {
-      // Reset the const Watchable(0) used by CounterState
-      const Watchable(0).value = 0;
+      // Reset the Watchable(0) used by CounterState
+      Watchable(0).value = 0;
     });
 
     test('counter state pattern works', () {
@@ -299,15 +285,15 @@ void main() {
 
   group('Transformation Functions', () {
     setUp(() {
-      const Watchable(10).value = 10;
-      const Watchable(42).value = 42;
-      const Watchable(5).value = 5;
-      const Watchable('Hello').value = 'Hello';
-      const Watchable(1).value = 1;
+      Watchable(10).value = 10;
+      Watchable(42).value = 42;
+      Watchable(5).value = 5;
+      Watchable('Hello').value = 'Hello';
+      Watchable(1).value = 1;
     });
 
     test('map transforms values correctly', () {
-      const watchable = Watchable(10);
+      final watchable = Watchable(10);
       final doubled = watchable.map((value) => value * 2);
 
       expect(doubled.value, 20);
@@ -317,7 +303,7 @@ void main() {
     });
 
     test('map with different types', () {
-      const intWatchable = Watchable(42);
+      final intWatchable = Watchable(42);
       final stringMapped = intWatchable.map((value) => 'Number: $value');
 
       expect(stringMapped.value, 'Number: 42');
@@ -327,7 +313,7 @@ void main() {
     });
 
     test('where filters values correctly', () {
-      const watchable = Watchable(5);
+      final watchable = Watchable(5);
       final evenOnly = watchable.where((value) => value % 2 == 0);
 
       // Initial value is 5 (odd), so it should still be 5
@@ -344,7 +330,7 @@ void main() {
     });
 
     test('distinct removes duplicates', () {
-      const watchable = Watchable(10);
+      final watchable = Watchable(10);
       final distinct = watchable.distinct();
 
       int notificationCount = 0;
@@ -368,7 +354,7 @@ void main() {
     });
 
     test('distinct with custom equality', () {
-      const watchable = Watchable('Hello');
+      final watchable = Watchable('Hello');
       final distinct =
           watchable.distinct((a, b) => a.toLowerCase() == b.toLowerCase());
 
@@ -391,7 +377,7 @@ void main() {
     });
 
     test('chained transformations work', () {
-      const watchable = Watchable(1);
+      final watchable = Watchable(1);
       final transformed = watchable
           .map((value) => value * 2)
           .where((value) => value > 5)
@@ -412,17 +398,17 @@ void main() {
 
   group('WatchableCombined2', () {
     setUp(() {
-      const Watchable(10).value = 10;
-      const Watchable('test').value = 'test';
-      const Watchable(5).value = 5;
-      const Watchable(true).value = true;
-      const Watchable(1).value = 1;
-      const Watchable(2).value = 2;
+      Watchable(10).value = 10;
+      Watchable('test').value = 'test';
+      Watchable(5).value = 5;
+      Watchable(true).value = true;
+      Watchable(1).value = 1;
+      Watchable(2).value = 2;
     });
 
     test('combines two watchables correctly', () {
-      const watchable1 = Watchable(10);
-      const watchable2 = Watchable('test');
+      final watchable1 = Watchable(10);
+      final watchable2 = Watchable('test');
       final combined =
           WatchableCombined2(watchable1, watchable2, (a, b) => '$a-$b');
 
@@ -436,8 +422,8 @@ void main() {
     });
 
     test('combines different types', () {
-      const intWatchable = Watchable(5);
-      const boolWatchable = Watchable(true);
+      final intWatchable = Watchable(5);
+      final boolWatchable = Watchable(true);
       final combined = WatchableCombined2(
           intWatchable, boolWatchable, (i, b) => b ? i * 2 : i);
 
@@ -454,8 +440,8 @@ void main() {
     });
 
     test('notifies listeners when source values change', () {
-      const watchable1 = Watchable(1);
-      const watchable2 = Watchable(2);
+      final watchable1 = Watchable(1);
+      final watchable2 = Watchable(2);
       final combined =
           WatchableCombined2(watchable1, watchable2, (a, b) => a + b);
 
@@ -479,18 +465,18 @@ void main() {
 
   group('WatchableCombined3', () {
     setUp(() {
-      const Watchable(1).value = 1;
-      const Watchable(2).value = 2;
-      const Watchable(3).value = 3;
-      const Watchable('John').value = 'John';
-      const Watchable(25).value = 25;
-      const Watchable(true).value = true;
+      Watchable(1).value = 1;
+      Watchable(2).value = 2;
+      Watchable(3).value = 3;
+      Watchable('John').value = 'John';
+      Watchable(25).value = 25;
+      Watchable(true).value = true;
     });
 
     test('combines three watchables correctly', () {
-      const w1 = Watchable(1);
-      const w2 = Watchable(2);
-      const w3 = Watchable(3);
+      final w1 = Watchable(1);
+      final w2 = Watchable(2);
+      final w3 = Watchable(3);
       final combined = WatchableCombined3(w1, w2, w3, (a, b, c) => a + b + c);
 
       expect(combined.value, 6); // 1 + 2 + 3
@@ -506,9 +492,9 @@ void main() {
     });
 
     test('combines different types', () {
-      const name = Watchable('John');
-      const age = Watchable(25);
-      const isActive = Watchable(true);
+      final name = Watchable('John');
+      final age = Watchable(25);
+      final isActive = Watchable(true);
       final combined = WatchableCombined3(name, age, isActive,
           (n, a, active) => active ? '$n ($a)' : '$n (inactive)');
 
@@ -528,17 +514,17 @@ void main() {
 
   group('WatchableCombined4', () {
     setUp(() {
-      const Watchable(1).value = 1;
-      const Watchable(2).value = 2;
-      const Watchable(3).value = 3;
-      const Watchable(4).value = 4;
+      Watchable(1).value = 1;
+      Watchable(2).value = 2;
+      Watchable(3).value = 3;
+      Watchable(4).value = 4;
     });
 
     test('combines four watchables correctly', () {
-      const w1 = Watchable(1);
-      const w2 = Watchable(2);
-      const w3 = Watchable(3);
-      const w4 = Watchable(4);
+      final w1 = Watchable(1);
+      final w2 = Watchable(2);
+      final w3 = Watchable(3);
+      final w4 = Watchable(4);
       final combined =
           WatchableCombined4(w1, w2, w3, w4, (a, b, c, d) => a + b + c + d);
 
@@ -551,19 +537,19 @@ void main() {
 
   group('WatchableCombined5', () {
     setUp(() {
-      const Watchable(1).value = 1;
-      const Watchable(2).value = 2;
-      const Watchable(3).value = 3;
-      const Watchable(4).value = 4;
-      const Watchable(5).value = 5;
+      Watchable(1).value = 1;
+      Watchable(2).value = 2;
+      Watchable(3).value = 3;
+      Watchable(4).value = 4;
+      Watchable(5).value = 5;
     });
 
     test('combines five watchables correctly', () {
-      const w1 = Watchable(1);
-      const w2 = Watchable(2);
-      const w3 = Watchable(3);
-      const w4 = Watchable(4);
-      const w5 = Watchable(5);
+      final w1 = Watchable(1);
+      final w2 = Watchable(2);
+      final w3 = Watchable(3);
+      final w4 = Watchable(4);
+      final w5 = Watchable(5);
       final combined = WatchableCombined5(
           w1, w2, w3, w4, w5, (a, b, c, d, e) => a + b + c + d + e);
 
@@ -576,21 +562,21 @@ void main() {
 
   group('WatchableCombined6', () {
     setUp(() {
-      const Watchable(1).value = 1;
-      const Watchable(2).value = 2;
-      const Watchable(3).value = 3;
-      const Watchable(4).value = 4;
-      const Watchable(5).value = 5;
-      const Watchable(6).value = 6;
+      Watchable(1).value = 1;
+      Watchable(2).value = 2;
+      Watchable(3).value = 3;
+      Watchable(4).value = 4;
+      Watchable(5).value = 5;
+      Watchable(6).value = 6;
     });
 
     test('combines six watchables correctly', () {
-      const w1 = Watchable(1);
-      const w2 = Watchable(2);
-      const w3 = Watchable(3);
-      const w4 = Watchable(4);
-      const w5 = Watchable(5);
-      const w6 = Watchable(6);
+      final w1 = Watchable(1);
+      final w2 = Watchable(2);
+      final w3 = Watchable(3);
+      final w4 = Watchable(4);
+      final w5 = Watchable(5);
+      final w6 = Watchable(6);
       final combined = WatchableCombined6(
           w1, w2, w3, w4, w5, w6, (a, b, c, d, e, f) => a + b + c + d + e + f);
 
@@ -603,8 +589,8 @@ void main() {
 
   group('Combiner Efficiency', () {
     test('combiner notifier is reused', () {
-      const w1 = Watchable(1);
-      const w2 = Watchable(2);
+      final w1 = Watchable(1);
+      final w2 = Watchable(2);
       final combined = WatchableCombined2(w1, w2, (a, b) => a + b);
 
       final notifier1 = combined.notifier;
@@ -613,8 +599,8 @@ void main() {
     });
 
     test('combiner updates only when source changes', () {
-      const w1 = Watchable(1);
-      const w2 = Watchable(2);
+      final w1 = Watchable(1);
+      final w2 = Watchable(2);
       final combined = WatchableCombined2(w1, w2, (a, b) => a + b);
 
       int notificationCount = 0;
@@ -637,17 +623,17 @@ void main() {
 
   group('WatchableBuilder Widget', () {
     setUp(() {
-      const Watchable(42).value = 42;
-      const Watchable(0).value = 0;
-      const Watchable(5).value = 5;
-      const Watchable(10).value = 10;
-      const Watchable('John').value = 'John';
-      const Watchable('Doe').value = 'Doe';
+      Watchable(42).value = 42;
+      Watchable(0).value = 0;
+      Watchable(5).value = 5;
+      Watchable(10).value = 10;
+      Watchable('John').value = 'John';
+      Watchable('Doe').value = 'Doe';
     });
 
     testWidgets('WatchableBuilder renders initial value',
         (WidgetTester tester) async {
-      const watchable = Watchable(42);
+      final watchable = Watchable(42);
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
@@ -663,7 +649,7 @@ void main() {
 
     testWidgets('WatchableBuilder updates when value changes',
         (WidgetTester tester) async {
-      const watchable = Watchable(0);
+      final watchable = Watchable(0);
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
@@ -685,7 +671,7 @@ void main() {
 
     testWidgets('WatchableBuilder with shouldRebuild',
         (WidgetTester tester) async {
-      const watchable = Watchable(0);
+      final watchable = Watchable(0);
       int buildCount = 0;
 
       await tester.pumpWidget(MaterialApp(
@@ -756,7 +742,7 @@ void main() {
 
     testWidgets('Multiple WatchableBuilders with same watchable',
         (WidgetTester tester) async {
-      const watchable = Watchable(5);
+      final watchable = Watchable(5);
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
@@ -787,7 +773,7 @@ void main() {
 
     testWidgets('WatchableBuilder with transformed watchable',
         (WidgetTester tester) async {
-      const watchable = Watchable(10);
+      final watchable = Watchable(10);
       final doubled = watchable.map((value) => value * 2);
 
       await tester.pumpWidget(MaterialApp(
@@ -809,8 +795,8 @@ void main() {
 
     testWidgets('WatchableBuilder with combined watchables',
         (WidgetTester tester) async {
-      const firstName = Watchable('John');
-      const lastName = Watchable('Doe');
+      final firstName = Watchable('John');
+      final lastName = Watchable('Doe');
       final combined =
           WatchableCombined2(firstName, lastName, (f, l) => '$f $l');
 
@@ -839,16 +825,16 @@ void main() {
 
   group('Edge Cases and Error Conditions', () {
     setUp(() {
-      const Watchable<String?>(null).value = null;
-      const Watchable<int?>(5).value = 5;
-      const Watchable(10).value = 10;
-      const Watchable<List<int>>([]).value = [];
-      const Watchable<Map<String, int>>({}).value = {};
-      const Watchable(Status.pending).value = Status.pending;
+      Watchable<String?>(null).value = null;
+      Watchable<int?>(5).value = 5;
+      Watchable(10).value = 10;
+      Watchable<List<int>>([]).value = [];
+      Watchable<Map<String, int>>({}).value = {};
+      Watchable(Status.pending).value = Status.pending;
     });
 
     test('null values work correctly', () {
-      const watchable = Watchable<String?>(null);
+      final watchable = Watchable<String?>(null);
       expect(watchable.value, null);
 
       watchable.value = 'not null';
@@ -859,7 +845,7 @@ void main() {
     });
 
     test('nullable transformed values', () {
-      const watchable = Watchable<int?>(5);
+      final watchable = Watchable<int?>(5);
       final transformed = watchable.map<String?>((value) => value?.toString());
 
       expect(transformed.value, '5');
@@ -872,7 +858,7 @@ void main() {
     });
 
     test('where transformation with null values', () {
-      const watchable = Watchable<int?>(5);
+      final watchable = Watchable<int?>(5);
       final filtered = watchable.where((value) => value != null && value > 3);
 
       expect(filtered.value, 5); // Initial value passes filter
@@ -888,7 +874,7 @@ void main() {
     });
 
     test('distinct with null values', () {
-      const watchable = Watchable<String?>(null);
+      final watchable = Watchable<String?>(null);
       final distinct = watchable.distinct();
 
       int notificationCount = 0;
@@ -907,8 +893,8 @@ void main() {
     });
 
     test('empty list and map handling', () {
-      const listWatchable = Watchable<List<int>>([]);
-      const mapWatchable = Watchable<Map<String, int>>({});
+      final listWatchable = Watchable<List<int>>([]);
+      final mapWatchable = Watchable<Map<String, int>>({});
 
       expect(listWatchable.value, []);
       expect(mapWatchable.value, {});
@@ -921,8 +907,8 @@ void main() {
     });
 
     test('large values work correctly', () {
-      const intWatchable = Watchable(999999999);
-      const doubleWatchable = Watchable(999999999.999999);
+      final intWatchable = Watchable(999999999);
+      final doubleWatchable = Watchable(999999999.999999);
       final stringWatchable = Watchable('a' * 1000); // Very long string
 
       expect(intWatchable.value, 999999999);
@@ -954,7 +940,7 @@ void main() {
     });
 
     test('enum values work correctly', () {
-      const statusWatchable = Watchable(Status.pending);
+      final statusWatchable = Watchable(Status.pending);
       expect(statusWatchable.value, Status.pending);
 
       statusWatchable.value = Status.active;
@@ -965,7 +951,7 @@ void main() {
     });
 
     test('transformation chain with error handling', () {
-      const watchable = Watchable(10);
+      final watchable = Watchable(10);
 
       // Chain of transformations that could potentially cause issues
       final transformed = watchable
@@ -984,8 +970,8 @@ void main() {
     });
 
     test('combiner with null values', () {
-      const watchable1 = Watchable<int?>(null);
-      const watchable2 = Watchable<String?>(null);
+      final watchable1 = Watchable<int?>(null);
+      final watchable2 = Watchable<String?>(null);
       final combined = WatchableCombined2(watchable1, watchable2,
           (a, b) => 'Combined: ${a ?? 'null'}-${b ?? 'null'}');
 
@@ -999,7 +985,7 @@ void main() {
     });
 
     test('memory management - listener removal', () {
-      const watchable = Watchable(0);
+      final watchable = Watchable(0);
       final notifier = watchable.notifier;
 
       void listener1() {}
@@ -1019,7 +1005,7 @@ void main() {
     });
 
     test('performance with many value changes', () {
-      const watchable = Watchable(0);
+      final watchable = Watchable(0);
 
       // Simulate many rapid changes
       for (int i = 0; i < 1000; i++) {
@@ -1030,7 +1016,7 @@ void main() {
     });
 
     test('concurrent access simulation', () {
-      const watchable = Watchable(0);
+      final watchable = Watchable(0);
 
       // Simulate concurrent modifications
       watchable.value = 1;
@@ -1047,19 +1033,19 @@ void main() {
   group('Const Construction Verification', () {
     // Reset commonly used const values before each test
     setUp(() {
-      const Watchable(0).value = 0;
-      const Watchable(1).value = 1;
-      const Watchable(100).value = 100;
-      const Watchable(42).value = 42;
-      const Watchable<List<int>>([]).value = [];
-      const Watchable<Map<String, int>>({}).value = {};
-      const Watchable<User?>(null).value = null;
+      Watchable(0).value = 0;
+      Watchable(1).value = 1;
+      Watchable(100).value = 100;
+      Watchable(42).value = 42;
+      Watchable<List<int>>([]).value = [];
+      Watchable<Map<String, int>>({}).value = {};
+      Watchable<User?>(null).value = null;
     });
 
-    test('const watchable with different values work independently', () {
+    test('final watchable with different values work independently', () {
       // Use different const values to get different instances
-      const counter1 = Watchable(0);
-      const counter2 = Watchable(1);
+      final counter1 = Watchable(0);
+      final counter2 = Watchable(1);
 
       // These should be different instances
       expect(identical(counter1, counter2), false);
@@ -1080,47 +1066,44 @@ void main() {
       counter2.value = 1;
     });
 
-    test('const watchable can be used in const contexts', () {
-      // This would compile-time error if const construction doesn't work
-      const constList = [
-        Watchable(111), // Use unique values to avoid test pollution
+    test('watchables can be stored in lists', () {
+      final watchableList = [
+        Watchable(111),
         Watchable('testUnique'),
         Watchable(true),
         Watchable(3.14159),
       ];
 
-      expect(constList.length, 4);
-      expect(constList[0].value, 111);
-      expect(constList[1].value, 'testUnique');
-      expect(constList[2].value, true);
-      expect(constList[3].value, 3.14159);
+      expect(watchableList.length, 4);
+      expect(watchableList[0].value, 111);
+      expect(watchableList[1].value, 'testUnique');
+      expect(watchableList[2].value, true);
+      expect(watchableList[3].value, 3.14159);
     });
 
-    test('const watchable in class definitions', () {
-      // Static const should be the same instance
+    test('final watchable in class definitions', () {
+      // Static final is shared across all accesses
       expect(identical(_TestState.defaultCounter, _TestState.defaultCounter),
           true);
 
-      // Instance const with same value would be identical due to const canonicalization
+      // Instance fields are independent (each instance gets its own Watchable)
       final state1 = _TestState();
       final state2 = _TestState();
       expect(identical(state1.counter, state2.counter),
-          true); // Same const value (100)
+          false); // Each instance has its own Watchable
 
-      // Since they're identical, changes affect both
+      // Changes to one don't affect the other
       state1.counter.value = 200;
-      expect(state2.counter.value, 200); // Both show 200
-
-      // Reset the shared instance
-      state1.counter.value = 100;
+      expect(state1.counter.value, 200);
+      expect(state2.counter.value, 100); // Unchanged
 
       expect(_TestState.defaultCounter.value, 0);
     });
 
-    test('const watchable with complex types', () {
-      const listWatchable = Watchable<List<int>>([]);
-      const mapWatchable = Watchable<Map<String, int>>({});
-      const userWatchable = Watchable<User?>(null);
+    test('final watchable with complex types', () {
+      final listWatchable = Watchable<List<int>>([]);
+      final mapWatchable = Watchable<Map<String, int>>({});
+      final userWatchable = Watchable<User?>(null);
 
       // Reset to ensure clean state (in case other tests modified these)
       listWatchable.value = [];
@@ -1141,8 +1124,8 @@ void main() {
       expect(userWatchable.value?.name, 'Test');
     });
 
-    test('const watchable notifier consistency', () {
-      const watchable = Watchable(9999); // Unique value to avoid conflicts
+    test('final watchable notifier consistency', () {
+      final watchable = Watchable(9999); // Unique value to avoid conflicts
 
       // Get notifier multiple times - should be the same instance
       final notifier1 = watchable.notifier;
@@ -1157,10 +1140,10 @@ void main() {
       expect(notifier1.value, 9999);
     });
 
-    test('const watchable static map management', () {
-      const w1 = Watchable(1);
-      const w2 = Watchable(2);
-      const w3 = Watchable(3);
+    test('final watchable static map management', () {
+      final w1 = Watchable(1);
+      final w2 = Watchable(2);
+      final w3 = Watchable(3);
 
       // Access notifiers to populate the static map
       final n1 = w1.notifier;
@@ -1178,7 +1161,7 @@ void main() {
       expect(identical(w3.notifier, n3), true);
     });
 
-    test('const watchable with CounterState pattern verification', () {
+    test('final watchable with CounterState pattern verification', () {
       // This tests the exact pattern shown in the example
       final state = _TestCounterState();
 
@@ -1218,18 +1201,18 @@ void main() {
 
   group('Integration Tests', () {
     setUp(() {
-      const Watchable('').value = '';
-      const Watchable(0).value = 0;
-      const Watchable(false).value = false;
-      const Watchable(12345).value = 12345;
-      const Watchable('WidgetTest').value = 'WidgetTest';
+      Watchable('').value = '';
+      Watchable(0).value = 0;
+      Watchable(false).value = false;
+      Watchable(12345).value = 12345;
+      Watchable('WidgetTest').value = 'WidgetTest';
     });
 
     test('complete workflow with const construction', () {
-      // Create const watchables
-      const name = Watchable('');
-      const age = Watchable(0);
-      const isActive = Watchable(false);
+      // Create final watchables
+      final name = Watchable('');
+      final age = Watchable(0);
+      final isActive = Watchable(false);
 
       // Create transformations
       final nameUppercase = name.map((n) => n.toUpperCase());
@@ -1265,8 +1248,8 @@ void main() {
 
     testWidgets('complete widget integration test',
         (WidgetTester tester) async {
-      const counter = Watchable(12345); // Unique values to avoid conflicts
-      const name = Watchable('WidgetTest');
+      final counter = Watchable(12345); // Unique values to avoid conflicts
+      final name = Watchable('WidgetTest');
 
       final combined = WatchableCombined2(counter, name, (c, n) => '$n: $c');
 
@@ -1314,15 +1297,15 @@ void main() {
 
   group('Error Handling and Exception Cases', () {
     setUp(() {
-      const Watchable('123').value = '123';
-      const Watchable(0).value = 0;
-      const Watchable<String?>(null).value = null;
-      const Watchable<String?>('test').value = 'test';
-      const Watchable(10).value = 10;
+      Watchable('123').value = '123';
+      Watchable(0).value = 0;
+      Watchable<String?>(null).value = null;
+      Watchable<String?>('test').value = 'test';
+      Watchable(10).value = 10;
     });
 
     test('transformation exceptions are handled gracefully', () {
-      const watchable = Watchable('123');
+      final watchable = Watchable('123');
       final transformed = watchable.map((value) {
         if (value == 'invalid') {
           throw FormatException('Invalid number format');
@@ -1340,7 +1323,7 @@ void main() {
     });
 
     test('map transformation with division by zero handling', () {
-      const watchable = Watchable(10);
+      final watchable = Watchable(10);
       final transformed = watchable.map((value) {
         if (value == 0) {
           return double.infinity; // Handle division by zero gracefully
@@ -1358,7 +1341,7 @@ void main() {
     });
 
     test('where transformation with exception in predicate', () {
-      const watchable = Watchable<String?>('test');
+      final watchable = Watchable<String?>('test');
       final filtered = watchable.where((value) {
         try {
           return value != null && value.length > 2;
@@ -1381,7 +1364,7 @@ void main() {
     });
 
     test('distinct transformation with custom equality exception handling', () {
-      const watchable = Watchable<String?>('test');
+      final watchable = Watchable<String?>('test');
       final distinct = watchable.distinct((a, b) {
         try {
           return a?.toLowerCase() == b?.toLowerCase();
@@ -1406,8 +1389,8 @@ void main() {
     });
 
     test('combiner with exception in combiner function', () {
-      const w1 = Watchable(10);
-      const w2 = Watchable(0);
+      final w1 = Watchable(10);
+      final w2 = Watchable(0);
       final combined = WatchableCombined2(w1, w2, (a, b) {
         if (b == 0) {
           return 'Division by zero!'; // Handle gracefully
@@ -1536,144 +1519,96 @@ void main() {
     });
   });
 
-  group('Collection Equality Tests', () {
-    setUp(() {
-      const Watchable([]).value = [];
-      const Watchable({}).value = {};
-      const Watchable(<int>{}).value = <int>{};
-    });
+  group('Identity-Based Collection Tests (v6.0.0)', () {
+    // v6.0.0 uses identical() for O(1) equality checks
+    // Any new object assignment triggers notification, regardless of content
 
-    test('List equality - identical lists are equal', () {
-      final watchable = const Watchable<List<int>>([]);
+    test('List - new object always triggers notification', () {
+      final watchable = Watchable<List<int>>([]);
       int notifications = 0;
       watchable.notifier.addListener(() => notifications++);
 
       watchable.value = [1, 2, 3];
       expect(notifications, equals(1));
 
-      // Setting the same list should not trigger notification
+      // New list object triggers notification (even with same content)
       watchable.value = [1, 2, 3];
-      expect(notifications, equals(1)); // No additional notification
-    });
-
-    test('List equality - different order triggers notification', () {
-      final watchable = [1, 2, 3].watchable;
-      int notifications = 0;
-      watchable.notifier.addListener(() => notifications++);
-
-      watchable.value = [3, 2, 1];
-      expect(notifications, equals(1));
-      expect(watchable.value, equals([3, 2, 1]));
-    });
-
-    test('List equality - nested lists work correctly', () {
-      final watchable = const Watchable<List<List<int>>>([]);
-      int notifications = 0;
-      watchable.notifier.addListener(() => notifications++);
-
-      watchable.value = [
-        [1, 2],
-        [3, 4]
-      ];
-      expect(notifications, equals(1));
-
-      // Same nested structure should not trigger
-      watchable.value = [
-        [1, 2],
-        [3, 4]
-      ];
-      expect(notifications, equals(1));
-
-      // Different nested structure should trigger
-      watchable.value = [
-        [1, 2],
-        [4, 3]
-      ];
       expect(notifications, equals(2));
     });
 
-    test('Map equality - identical maps are equal', () {
-      final watchable = const Watchable<Map<String, int>>({});
+    test('List - same object does not trigger notification', () {
+      final list = [1, 2, 3];
+      final watchable = Watchable<List<int>>(list);
+      int notifications = 0;
+      watchable.notifier.addListener(() => notifications++);
+
+      // Same object does not trigger
+      watchable.value = list;
+      expect(notifications, equals(0));
+
+      // New object triggers
+      watchable.value = [1, 2, 3];
+      expect(notifications, equals(1));
+    });
+
+    test('Map - new object always triggers notification', () {
+      final watchable = Watchable<Map<String, int>>({});
       int notifications = 0;
       watchable.notifier.addListener(() => notifications++);
 
       watchable.value = {'a': 1, 'b': 2};
       expect(notifications, equals(1));
 
-      // Setting the same map should not trigger notification
+      // New map object triggers notification (even with same content)
       watchable.value = {'a': 1, 'b': 2};
-      expect(notifications, equals(1)); // No additional notification
-    });
-
-    test('Map equality - different order (same content) are equal', () {
-      final watchable = {'a': 1, 'b': 2}.watchable;
-      int notifications = 0;
-      watchable.notifier.addListener(() => notifications++);
-
-      // Maps with same content but different insertion order should be equal
-      watchable.value = {'b': 2, 'a': 1};
-      expect(notifications, equals(0)); // Should not trigger notification
-      expect(watchable.value, equals({'b': 2, 'a': 1}));
-    });
-
-    test('Map equality - nested maps work correctly', () {
-      final watchable = const Watchable<Map<String, Map<String, int>>>({});
-      int notifications = 0;
-      watchable.notifier.addListener(() => notifications++);
-
-      watchable.value = {
-        'outer': {'inner': 42}
-      };
-      expect(notifications, equals(1));
-
-      // Same nested structure should not trigger
-      watchable.value = {
-        'outer': {'inner': 42}
-      };
-      expect(notifications, equals(1));
-
-      // Different nested value should trigger
-      watchable.value = {
-        'outer': {'inner': 43}
-      };
       expect(notifications, equals(2));
     });
 
-    test('Set equality - identical sets are equal', () {
-      final watchable = const Watchable<Set<int>>(<int>{});
+    test('Map - same object does not trigger notification', () {
+      final map = {'a': 1, 'b': 2};
+      final watchable = Watchable<Map<String, int>>(map);
+      int notifications = 0;
+      watchable.notifier.addListener(() => notifications++);
+
+      // Same object does not trigger
+      watchable.value = map;
+      expect(notifications, equals(0));
+
+      // New object triggers
+      watchable.value = {'a': 1, 'b': 2};
+      expect(notifications, equals(1));
+    });
+
+    test('Set - new object always triggers notification', () {
+      final watchable = Watchable<Set<int>>(<int>{});
       int notifications = 0;
       watchable.notifier.addListener(() => notifications++);
 
       watchable.value = {1, 2, 3};
       expect(notifications, equals(1));
 
-      // Setting the same set should not trigger notification
+      // New set object triggers notification (even with same content)
       watchable.value = {1, 2, 3};
-      expect(notifications, equals(1)); // No additional notification
+      expect(notifications, equals(2));
     });
 
-    test('Set equality - different order (same content) are equal', () {
-      final watchable = {1, 2, 3}.watchable;
+    test('Set - same object does not trigger notification', () {
+      final set = {1, 2, 3};
+      final watchable = Watchable<Set<int>>(set);
       int notifications = 0;
       watchable.notifier.addListener(() => notifications++);
 
-      // Sets with same content but different order should be equal
-      watchable.value = {3, 1, 2};
-      expect(notifications, equals(0)); // Should not trigger notification
-    });
+      // Same object does not trigger
+      watchable.value = set;
+      expect(notifications, equals(0));
 
-    test('Set equality - different content triggers notification', () {
-      final watchable = {1, 2, 3}.watchable;
-      int notifications = 0;
-      watchable.notifier.addListener(() => notifications++);
-
-      watchable.value = {1, 2, 4};
+      // New object triggers
+      watchable.value = {1, 2, 3};
       expect(notifications, equals(1));
-      expect(watchable.value, equals({1, 2, 4}));
     });
 
-    test('Mixed collection types - List of Maps', () {
-      final watchable = const Watchable<List<Map<String, int>>>([]);
+    test('Nested collections - new objects always trigger', () {
+      final watchable = Watchable<List<Map<String, int>>>([]);
       int notifications = 0;
       watchable.notifier.addListener(() => notifications++);
 
@@ -1683,207 +1618,105 @@ void main() {
       ];
       expect(notifications, equals(1));
 
-      // Same structure should not trigger
+      // New list object triggers (even with same content)
       watchable.value = [
         {'a': 1},
         {'b': 2}
       ];
-      expect(notifications, equals(1));
-
-      // Different order of maps should trigger (List order matters)
-      watchable.value = [
-        {'b': 2},
-        {'a': 1}
-      ];
       expect(notifications, equals(2));
     });
 
-    test('Mixed collection types - Map of Lists', () {
-      final watchable = const Watchable<Map<String, List<int>>>({});
+    test('Collection with null values', () {
+      final listWatchable = Watchable<List<int?>>([]);
       int notifications = 0;
-      watchable.notifier.addListener(() => notifications++);
+      listWatchable.notifier.addListener(() => notifications++);
 
-      watchable.value = {
-        'first': [1, 2],
-        'second': [3, 4]
-      };
-      expect(notifications, equals(1));
-
-      // Same structure should not trigger
-      watchable.value = {
-        'first': [1, 2],
-        'second': [3, 4]
-      };
-      expect(notifications, equals(1));
-
-      // Different list content should trigger
-      watchable.value = {
-        'first': [1, 3],
-        'second': [3, 4]
-      };
-      expect(notifications, equals(2));
-    });
-
-    test('Collection equality with null values', () {
-      final listWatchable = const Watchable<List<int?>>([]);
-      final mapWatchable = const Watchable<Map<String, int?>>({});
-
-      int listNotifications = 0;
-      int mapNotifications = 0;
-
-      listWatchable.notifier.addListener(() => listNotifications++);
-      mapWatchable.notifier.addListener(() => mapNotifications++);
-
-      // Lists with null values
       listWatchable.value = [1, null, 3];
-      expect(listNotifications, equals(1));
-
-      listWatchable.value = [1, null, 3]; // Same list
-      expect(listNotifications, equals(1)); // No additional notification
-
-      // Maps with null values
-      mapWatchable.value = {'a': 1, 'b': null};
-      expect(mapNotifications, equals(1));
-
-      mapWatchable.value = {'a': 1, 'b': null}; // Same map
-      expect(mapNotifications, equals(1)); // No additional notification
-    });
-
-    test('Empty collections equality', () {
-      final listWatchable = [1, 2, 3].watchable;
-      final mapWatchable = {'a': 1}.watchable;
-      final setWatchable = {1, 2, 3}.watchable;
-
-      int listNotifications = 0;
-      int mapNotifications = 0;
-      int setNotifications = 0;
-
-      listWatchable.notifier.addListener(() => listNotifications++);
-      mapWatchable.notifier.addListener(() => mapNotifications++);
-      setWatchable.notifier.addListener(() => setNotifications++);
-
-      // Setting to empty collections
-      listWatchable.value = [];
-      mapWatchable.value = {};
-      setWatchable.value = {};
-
-      expect(listNotifications, equals(1));
-      expect(mapNotifications, equals(1));
-      expect(setNotifications, equals(1));
-
-      // Setting empty again should not trigger
-      listWatchable.value = [];
-      mapWatchable.value = {};
-      setWatchable.value = {};
-
-      expect(listNotifications, equals(1));
-      expect(mapNotifications, equals(1));
-      expect(setNotifications, equals(1));
-    });
-
-    test('Complex nested equality - List<Map<String, Set<int>>>', () {
-      final watchable = const Watchable<List<Map<String, Set<int>>>>([]);
-      int notifications = 0;
-      watchable.notifier.addListener(() => notifications++);
-
-      final complexValue = [
-        {
-          'group1': {1, 2, 3},
-          'group2': {4, 5}
-        },
-        {
-          'group3': {6, 7, 8}
-        }
-      ];
-
-      watchable.value = complexValue;
       expect(notifications, equals(1));
 
-      // Same complex structure should not trigger
-      watchable.value = [
-        {
-          'group1': {1, 2, 3},
-          'group2': {4, 5}
-        },
-        {
-          'group3': {6, 7, 8}
-        }
-      ];
-      expect(notifications, equals(1));
-
-      // Different set content should trigger
-      watchable.value = [
-        {
-          'group1': {1, 2, 4},
-          'group2': {4, 5}
-        }, // Changed 3 to 4
-        {
-          'group3': {6, 7, 8}
-        }
-      ];
+      // New list triggers notification
+      listWatchable.value = [1, null, 3];
       expect(notifications, equals(2));
     });
 
-    test('Collection equality performance with large collections', () {
+    test('Empty collections - new empty objects trigger', () {
+      final listWatchable = [1, 2, 3].watchable;
+      int notifications = 0;
+      listWatchable.notifier.addListener(() => notifications++);
+
+      // Setting to empty collection triggers
+      listWatchable.value = [];
+      expect(notifications, equals(1));
+
+      // Setting empty again triggers (new object)
+      listWatchable.value = [];
+      expect(notifications, equals(2));
+    });
+
+    test('Large collections - O(1) identity check performance', () {
       final largeList = List.generate(1000, (i) => i);
       final watchable = largeList.watchable;
 
       int notifications = 0;
       watchable.notifier.addListener(() => notifications++);
 
-      // Same large list should not trigger notification
-      watchable.value = List.generate(1000, (i) => i);
-      expect(notifications, equals(0));
+      final stopwatch = Stopwatch()..start();
 
-      // Different large list should trigger
-      watchable.value = List.generate(1000, (i) => i + 1);
+      // New list triggers notification (O(1) check)
+      watchable.value = List.generate(1000, (i) => i);
       expect(notifications, equals(1));
+
+      // Same object does not trigger
+      final sameList = watchable.value;
+      watchable.value = sameList;
+      expect(notifications, equals(1));
+
+      stopwatch.stop();
+      // Should be very fast due to O(1) identity check
+      expect(stopwatch.elapsedMilliseconds, lessThan(100));
     });
   });
 
-  group('Set Equality and Operations', () {
-    setUp(() {
-      const Watchable(<int>{}).value = <int>{};
-      const Watchable(<String>{}).value = <String>{};
-    });
+  group('Set Equality and Operations (v6.0.0)', () {
+    // v6.0.0: Extension methods create new objects, always triggering notifications
 
-    test('Set extension methods work correctly', () {
+    test('Set extension methods work correctly (v6.0.0)', () {
       final numbers = <int>{}.watchable;
       int notifications = 0;
       numbers.notifier.addListener(() => notifications++);
 
-      // Add operation
+      // Add operation - creates new Set
       numbers.add(1);
       expect(numbers.value, equals({1}));
       expect(notifications, equals(1));
 
-      // Add same element (Set behavior - no duplicate)
+      // Add same element - still creates new Set (v6.0.0)
       numbers.add(1);
       expect(numbers.value, equals({1}));
-      expect(notifications, equals(1)); // No additional notification
+      expect(notifications, equals(2)); // New object triggers
 
       // Add different element
       numbers.add(2);
       expect(numbers.value, equals({1, 2}));
-      expect(notifications, equals(2));
+      expect(notifications, equals(3));
 
       // Remove operation
       numbers.remove(1);
       expect(numbers.value, equals({2}));
-      expect(notifications, equals(3));
+      expect(notifications, equals(4));
 
-      // Remove non-existent element
+      // Remove non-existent - still creates new Set
       numbers.remove(999);
       expect(numbers.value, equals({2}));
-      expect(notifications, equals(3)); // No additional notification
+      expect(notifications, equals(5)); // New object triggers
 
       // Clear operation
       numbers.clear();
       expect(numbers.value, isEmpty);
-      expect(notifications, equals(4));
+      expect(notifications, equals(6));
     });
 
-    test('Set addAll operation', () {
+    test('Set addAll operation (v6.0.0)', () {
       final numbers = {1, 2}.watchable;
       int notifications = 0;
       numbers.notifier.addListener(() => notifications++);
@@ -1897,27 +1730,27 @@ void main() {
       expect(numbers.value, equals({1, 2, 3, 4, 5, 6}));
       expect(notifications, equals(2));
 
-      // AddAll with no new elements
+      // AddAll with no new elements - still creates new Set (v6.0.0)
       numbers.addAll({1, 2});
       expect(numbers.value, equals({1, 2, 3, 4, 5, 6}));
-      expect(notifications, equals(2)); // No additional notification
+      expect(notifications, equals(3)); // New object triggers
     });
 
-    test('Set with custom objects', () {
+    test('Set with custom objects (v6.0.0)', () {
       final items = <String>{}.watchable;
       int notifications = 0;
       items.notifier.addListener(() => notifications++);
 
       items.add('apple');
       items.add('banana');
-      items.add('apple'); // Duplicate
+      items.add('apple'); // Duplicate - still creates new Set
 
       expect(items.value, equals({'apple', 'banana'}));
-      expect(notifications, equals(2)); // Only 2 notifications, not 3
+      expect(notifications, equals(3)); // All 3 operations trigger
     });
 
-    test('Set equality with different implementations', () {
-      final watchable = const Watchable<Set<int>>(<int>{});
+    test('Set equality with different implementations (v6.0.0)', () {
+      final watchable = Watchable<Set<int>>(<int>{});
       int notifications = 0;
       watchable.notifier.addListener(() => notifications++);
 
@@ -1925,20 +1758,20 @@ void main() {
       watchable.value = LinkedHashSet<int>.from([1, 2, 3]);
       expect(notifications, equals(1));
 
-      // Regular HashSet with same content
+      // Regular HashSet with same content - different object triggers
       watchable.value = HashSet<int>.from([3, 2, 1]);
-      expect(notifications, equals(1)); // Should not trigger - same content
+      expect(notifications, equals(2)); // New object triggers (v6.0.0)
 
       // Different content
       watchable.value = HashSet<int>.from([1, 2, 4]);
-      expect(notifications, equals(2));
+      expect(notifications, equals(3));
     });
   });
 
   group('Map Equality Advanced Tests', () {
     setUp(() {
-      const Watchable<Map<String, int>>({}).value = {};
-      const Watchable<Map<int, String>>({}).value = {};
+      Watchable<Map<String, int>>({}).value = {};
+      Watchable<Map<int, String>>({}).value = {};
     });
 
     test('Map extension toggle operation for boolean flags', () {
@@ -1982,26 +1815,26 @@ void main() {
       expect(flagNotifications, equals(1));
     });
 
-    test('Map equality with different key types', () {
+    test('Map equality with different key types (v6.0.0)', () {
       // String keys
       final stringKeys = {'1': 'one', '2': 'two'}.watchable;
       int stringNotifications = 0;
       stringKeys.notifier.addListener(() => stringNotifications++);
 
-      stringKeys.value = {'2': 'two', '1': 'one'}; // Different order
-      expect(stringNotifications, equals(0)); // Should not trigger
+      stringKeys.value = {'2': 'two', '1': 'one'}; // New object
+      expect(stringNotifications, equals(1)); // New object triggers (v6.0.0)
 
       // Integer keys
       final intKeys = {1: 'one', 2: 'two'}.watchable;
       int intNotifications = 0;
       intKeys.notifier.addListener(() => intNotifications++);
 
-      intKeys.value = {2: 'two', 1: 'one'}; // Different order
-      expect(intNotifications, equals(0)); // Should not trigger
+      intKeys.value = {2: 'two', 1: 'one'}; // New object
+      expect(intNotifications, equals(1)); // New object triggers (v6.0.0)
     });
 
-    test('Map with complex value types', () {
-      final watchable = const Watchable<Map<String, List<int>>>({});
+    test('Map with complex value types (v6.0.0)', () {
+      final watchable = Watchable<Map<String, List<int>>>({});
       int notifications = 0;
       watchable.notifier.addListener(() => notifications++);
 
@@ -2011,19 +1844,19 @@ void main() {
       };
       expect(notifications, equals(1));
 
-      // Same content should not trigger
+      // New object triggers (v6.0.0 identity-based)
       watchable.value = {
         'evens': [2, 4, 6],
         'odds': [1, 3, 5]
       };
-      expect(notifications, equals(1));
+      expect(notifications, equals(2)); // New object triggers
 
-      // Different list content should trigger
+      // Different list content
       watchable.value = {
         'evens': [2, 4, 8],
         'odds': [1, 3, 5]
       };
-      expect(notifications, equals(2));
+      expect(notifications, equals(3));
     });
 
     test('Map addAll operation maintains equality behavior', () {
@@ -2042,7 +1875,7 @@ void main() {
       expect(notifications, equals(2));
     });
 
-    test('Map removeKey operation', () {
+    test('Map removeKey operation (v6.0.0)', () {
       final data = {'a': 1, 'b': 2, 'c': 3}.watchable;
       int notifications = 0;
       data.notifier.addListener(() => notifications++);
@@ -2051,10 +1884,10 @@ void main() {
       expect(data.value, equals({'a': 1, 'c': 3}));
       expect(notifications, equals(1));
 
-      // Remove non-existent key
+      // Remove non-existent key - still creates new Map (v6.0.0)
       data.removeKey('nonexistent');
       expect(data.value, equals({'a': 1, 'c': 3}));
-      expect(notifications, equals(1)); // No additional notification
+      expect(notifications, equals(2)); // New object triggers
     });
   });
 
@@ -2091,12 +1924,12 @@ void main() {
       expect(notifications, equals(6));
     });
 
-    test('Map extension methods preserve equality behavior', () {
+    test('Map extension methods trigger notifications (v6.0.0)', () {
       final data = <String, int>{}.watchable;
       int notifications = 0;
       data.notifier.addListener(() => notifications++);
 
-      // Set operation
+      // Set operation - creates new Map
       data.set('a', 1);
       expect(notifications, equals(1));
       expect(data.value, equals({'a': 1}));
@@ -2106,70 +1939,70 @@ void main() {
       expect(notifications, equals(2));
       expect(data.value, equals({'a': 2}));
 
-      // Set same key with same value (should not trigger)
+      // Set same key with same value - still creates new Map (v6.0.0)
       data.set('a', 2);
-      expect(notifications, equals(2)); // No additional notification
+      expect(notifications, equals(3)); // New object triggers
 
       // AddAll operation
       data.addAll({'b': 3, 'c': 4});
-      expect(notifications, equals(3));
+      expect(notifications, equals(4));
       expect(data.value, equals({'a': 2, 'b': 3, 'c': 4}));
 
       // RemoveKey operation
       data.removeKey('b');
-      expect(notifications, equals(4));
+      expect(notifications, equals(5));
       expect(data.value, equals({'a': 2, 'c': 4}));
 
-      // Remove non-existent key (should not trigger)
+      // Remove non-existent key - still creates new Map (v6.0.0)
       data.removeKey('nonexistent');
-      expect(notifications, equals(4)); // No additional notification
+      expect(notifications, equals(6)); // New object triggers
 
       // Clear operation
       data.clear();
-      expect(notifications, equals(5));
+      expect(notifications, equals(7));
       expect(data.value, isEmpty);
     });
 
-    test('Set extension methods preserve equality behavior', () {
+    test('Set extension methods trigger notifications (v6.0.0)', () {
       final numbers = <int>{}.watchable;
       int notifications = 0;
       numbers.notifier.addListener(() => notifications++);
 
-      // Add operation
+      // Add operation - creates new Set
       numbers.add(1);
       expect(notifications, equals(1));
       expect(numbers.value, equals({1}));
 
-      // Add duplicate (should not trigger due to Set nature + equality)
+      // Add duplicate - still creates new Set (v6.0.0 identity-based)
       numbers.add(1);
-      expect(notifications, equals(1)); // No additional notification
+      expect(notifications, equals(2)); // New object triggers notification
 
       // Add different value
       numbers.add(2);
-      expect(notifications, equals(2));
+      expect(notifications, equals(3));
       expect(numbers.value, equals({1, 2}));
 
       // AddAll with new values
       numbers.addAll({3, 4});
-      expect(notifications, equals(3));
+      expect(notifications, equals(4));
       expect(numbers.value, equals({1, 2, 3, 4}));
 
-      // AddAll with duplicate values (should not trigger)
+      // AddAll with duplicate values - still creates new Set
       numbers.addAll({1, 2});
-      expect(notifications, equals(3)); // No additional notification
+      expect(notifications, equals(5)); // New object triggers notification
 
       // Remove operation
       numbers.remove(1);
-      expect(notifications, equals(4));
+      expect(notifications, equals(6));
       expect(numbers.value, equals({2, 3, 4}));
 
-      // Remove non-existent (should not trigger)
+      // Remove non-existent - still creates new Set
       numbers.remove(999);
-      expect(notifications, equals(4)); // No additional notification
+      expect(notifications, equals(7)); // New object triggers notification
 
       // Clear operation
       numbers.clear();
-      expect(notifications, equals(5));
+      expect(notifications, equals(8));
       expect(numbers.value, isEmpty);
 
       // Helper methods
@@ -2209,13 +2042,13 @@ void main() {
       expect(notifications, equals(5));
       expect(flags.value['feature4'], isTrue);
 
-      // Add same flag with same value (should not trigger)
+      // Add same flag with same value - creates new Map (v6.0.0)
       flags.add('feature4', true);
-      expect(notifications, equals(5)); // No additional notification
+      expect(notifications, equals(6)); // New object triggers notification
 
-      // Add same flag with different value (should trigger)
+      // Add same flag with different value
       flags.add('feature4', false);
-      expect(notifications, equals(6));
+      expect(notifications, equals(7));
       expect(flags.value['feature4'], isFalse);
     });
 
@@ -2241,7 +2074,7 @@ void main() {
       expect(intList.value, equals([1, 2, 3]));
     });
 
-    test('Extension methods work with nested collections', () {
+    test('Extension methods work with nested collections (v6.0.0)', () {
       final nestedData = <String, List<int>>{}.watchable;
       int notifications = 0;
       nestedData.notifier.addListener(() => notifications++);
@@ -2249,16 +2082,16 @@ void main() {
       nestedData.set('numbers', [1, 2, 3]);
       expect(notifications, equals(1));
 
-      // Setting same nested list should not trigger
+      // Setting same nested list - creates new Map (v6.0.0 identity-based)
       nestedData.set('numbers', [1, 2, 3]);
-      expect(notifications, equals(1)); // Deep equality works
+      expect(notifications, equals(2)); // New object triggers notification
 
-      // Setting different nested list should trigger
+      // Setting different nested list
       nestedData.set('numbers', [1, 2, 4]);
-      expect(notifications, equals(2));
+      expect(notifications, equals(3));
     });
 
-    test('Extension methods handle edge cases', () {
+    test('Extension methods handle edge cases (v6.0.0)', () {
       final emptyList = <String>[].watchable;
       final emptyMap = <String, int>{}.watchable;
       final emptySet = <int>{}.watchable;
@@ -2271,32 +2104,32 @@ void main() {
       emptyMap.notifier.addListener(() => mapNotifications++);
       emptySet.notifier.addListener(() => setNotifications++);
 
-      // Operations on empty collections
+      // Operations on empty collections - creates new objects (v6.0.0)
       emptyList.remove('nonexistent');
       emptyMap.removeKey('nonexistent');
       emptySet.remove(999);
 
-      expect(listNotifications, equals(0));
-      expect(mapNotifications, equals(0));
-      expect(setNotifications, equals(0));
+      expect(listNotifications, equals(1)); // New object triggers
+      expect(mapNotifications, equals(1));
+      expect(setNotifications, equals(1));
 
-      // Clear already empty collections
+      // Clear already empty collections - creates new objects
       emptyList.clear();
       emptyMap.clear();
       emptySet.clear();
 
-      expect(listNotifications, equals(0));
-      expect(mapNotifications, equals(0));
-      expect(setNotifications, equals(0));
+      expect(listNotifications, equals(2));
+      expect(mapNotifications, equals(2));
+      expect(setNotifications, equals(2));
 
       // Add to empty collections
       emptyList.add('first');
       emptyMap.set('first', 1);
       emptySet.add(1);
 
-      expect(listNotifications, equals(1));
-      expect(mapNotifications, equals(1));
-      expect(setNotifications, equals(1));
+      expect(listNotifications, equals(3));
+      expect(mapNotifications, equals(3));
+      expect(setNotifications, equals(3));
     });
   });
 
@@ -2377,51 +2210,44 @@ void main() {
       expect(notifications, equals(3));
     });
 
-    test('alwaysNotify works with collections', () {
-      final watchable = <String, int>{'a': 1}.watchable;
+    test('alwaysNotify works with collections (v6.0.0)', () {
+      final map = {'a': 1};
+      final watchable = Watchable<Map<String, int>>(map);
       int notifications = 0;
       watchable.notifier.addListener(() => notifications++);
 
-      // Normal behavior - identical maps don't trigger
+      // v6.0.0: new objects always trigger (identity-based)
       watchable.value = {'a': 1};
-      expect(notifications, equals(0));
+      expect(notifications, equals(1)); // New object triggers
 
       // Enable always notify
       watchable.alwaysNotify(enabled: true);
 
-      // Now identical maps should trigger
-      watchable.value = {'a': 1};
-      expect(notifications, equals(1));
+      // Now even same object triggers
+      final currentMap = watchable.value;
+      watchable.value = currentMap;
+      expect(notifications, equals(2));
 
       // Different maps still trigger
       watchable.value = {'a': 2};
-      expect(notifications, equals(2));
-
-      // Same map content should still trigger
-      watchable.value = {'a': 2};
       expect(notifications, equals(3));
+
+      // Same map content with new object should trigger
+      watchable.value = {'a': 2};
+      expect(notifications, equals(4));
     });
 
     test('alwaysNotify works with nested collections', () {
-      final watchable = [
-        {
-          'key': [1, 2, 3]
-        }
-      ].watchable;
-      int notifications = 0;
-      watchable.notifier.addListener(() => notifications++);
-
-      // Normal behavior - deep equal structures don't trigger
-      watchable.value = [
+      final nestedValue = [
         {
           'key': [1, 2, 3]
         }
       ];
-      expect(notifications, equals(0));
+      final watchable = Watchable(nestedValue);
+      int notifications = 0;
+      watchable.notifier.addListener(() => notifications++);
 
-      watchable.alwaysNotify(enabled: true);
-
-      // Now identical nested structures should trigger
+      // In v6.0.0, new objects always trigger (identity-based equality)
       watchable.value = [
         {
           'key': [1, 2, 3]
@@ -2429,12 +2255,18 @@ void main() {
       ];
       expect(notifications, equals(1));
 
+      watchable.alwaysNotify(enabled: true);
+
+      // With alwaysNotify, even same object triggers
+      watchable.value = watchable.value; // Same object
+      expect(notifications, equals(2));
+
       watchable.value = [
         {
           'key': [1, 2, 3]
         }
       ];
-      expect(notifications, equals(2));
+      expect(notifications, equals(3));
     });
 
     test('multiple watchables can have different alwaysNotify settings', () {
@@ -2463,8 +2295,8 @@ void main() {
       expect(watchable2.isAlwaysNotifying, isFalse);
     });
 
-    test('alwaysNotify works with const watchables', () {
-      const constWatchable = Watchable(100);
+    test('alwaysNotify works with final watchables', () {
+      final constWatchable = Watchable(100);
       int notifications = 0;
       constWatchable.notifier.addListener(() => notifications++);
 
@@ -2472,7 +2304,7 @@ void main() {
       constWatchable.value = 100;
       expect(notifications, equals(0));
 
-      // Enable always notify on const watchable
+      // Enable always notify on final watchable
       constWatchable.alwaysNotify(enabled: true);
 
       // Should now trigger on identical values
@@ -2544,15 +2376,15 @@ void main() {
 
   group('Boundary and Stress Testing', () {
     setUp(() {
-      const Watchable(0).value = 0;
-      const Watchable(1).value = 1;
-      const Watchable(2).value = 2;
-      const Watchable(5).value = 5;
-      const Watchable(3).value = 3;
+      Watchable(0).value = 0;
+      Watchable(1).value = 1;
+      Watchable(2).value = 2;
+      Watchable(5).value = 5;
+      Watchable(3).value = 3;
     });
 
     test('extremely large combiner chains', () {
-      const source = Watchable(999); // Use unique value
+      final source = Watchable(999); // Use unique value
       source.value = 1; // Reset to expected initial value
 
       // Create a chain of 10 transformations
@@ -2576,7 +2408,7 @@ void main() {
     });
 
     test('rapid value changes with listeners', () {
-      const watchable = Watchable(777); // Unique initial value
+      final watchable = Watchable(777); // Unique initial value
       final transformed = watchable.map((x) => x * 2).distinct();
 
       int notificationCount = 0;
@@ -2604,7 +2436,7 @@ void main() {
     });
 
     test('many combiners with same source', () {
-      const source = Watchable(5);
+      final source = Watchable(5);
 
       final combiner1 = WatchableCombined2(source, source, (a, b) => a + b);
       final combiner2 = WatchableCombined2(source, source, (a, b) => a * b);
@@ -2626,9 +2458,9 @@ void main() {
     });
 
     test('deep combiner nesting', () {
-      const w1 = Watchable(1);
-      const w2 = Watchable(2);
-      const w3 = Watchable(3);
+      final w1 = Watchable(1);
+      final w2 = Watchable(2);
+      final w3 = Watchable(3);
 
       final level1 = WatchableCombined2(w1, w2, (a, b) => a + b); // 1 + 2 = 3
       final level2 =
@@ -2646,7 +2478,7 @@ void main() {
     });
 
     test('maximum listeners stress test', () {
-      const watchable = Watchable(888); // Unique value to avoid conflicts
+      final watchable = Watchable(888); // Unique value to avoid conflicts
       final notifier = watchable.notifier;
 
       List<void Function()> listeners = [];
@@ -2707,15 +2539,15 @@ void main() {
 
   group('Type Safety and Casting', () {
     setUp(() {
-      const Watchable(42).value = 42;
-      const Watchable<int?>(null).value = null;
-      const Watchable<List<String>>(['a', 'b']).value = ['a', 'b'];
-      const Watchable<Map<String, int>>({'count': 2}).value = {'count': 2};
-      const Watchable(Status.pending).value = Status.pending;
+      Watchable(42).value = 42;
+      Watchable<int?>(null).value = null;
+      Watchable<List<String>>(['a', 'b']).value = ['a', 'b'];
+      Watchable<Map<String, int>>({'count': 2}).value = {'count': 2};
+      Watchable(Status.pending).value = Status.pending;
     });
 
     test('generic type preservation through transformations', () {
-      const intWatchable = Watchable(42);
+      final intWatchable = Watchable(42);
       final stringMapped =
           intWatchable.map<String>((value) => 'Number: $value');
       final backToInt = stringMapped.map<int>((str) => str.length);
@@ -2732,7 +2564,7 @@ void main() {
     });
 
     test('nullable type transformations maintain type safety', () {
-      const nullableInt = Watchable<int?>(null);
+      final nullableInt = Watchable<int?>(null);
       final nullableString =
           nullableInt.map<String?>((value) => value?.toString());
       final nonNullableLength =
@@ -2749,8 +2581,8 @@ void main() {
     });
 
     test('complex generic types in combiners', () {
-      const listWatchable = Watchable<List<String>>(['a', 'b']);
-      const mapWatchable = Watchable<Map<String, int>>({'count': 2});
+      final listWatchable = Watchable<List<String>>(['a', 'b']);
+      final mapWatchable = Watchable<Map<String, int>>({'count': 2});
 
       final combined = WatchableCombined2(
           listWatchable,
@@ -2772,7 +2604,7 @@ void main() {
     });
 
     test('enum type safety in transformations', () {
-      const statusWatchable = Watchable(Status.pending);
+      final statusWatchable = Watchable(Status.pending);
       final statusString = statusWatchable.map<String>((status) => status.name);
       final isActive =
           statusWatchable.map<bool>((status) => status == Status.active);
@@ -2794,7 +2626,7 @@ void main() {
 
   group('Cleanup and Resource Management', () {
     test('transformation chains maintain proper listener lifecycle', () {
-      const source = Watchable(1);
+      final source = Watchable(1);
       final chain = source.map((x) => x * 2).where((x) => x > 0).distinct();
 
       // Create listeners to test cleanup
@@ -2829,8 +2661,8 @@ void main() {
     });
 
     test('combiner resource cleanup', () {
-      const w1 = Watchable(1);
-      const w2 = Watchable(2);
+      final w1 = Watchable(1);
+      final w2 = Watchable(2);
       final combiner = WatchableCombined2(w1, w2, (a, b) => a + b);
 
       int combinerNotifications = 0;
@@ -2853,7 +2685,7 @@ void main() {
     });
 
     test('no memory leaks with repeated listener operations', () {
-      const watchable = Watchable(0);
+      final watchable = Watchable(0);
       final notifier = watchable.notifier;
 
       // Repeatedly add and remove listeners
@@ -3020,8 +2852,8 @@ void main() {
     });
 
     test('extension methods with null safety edge cases', () {
-      final nullableString = const Watchable<String?>(null);
-      final nullableList = const Watchable<List<int>?>(null);
+      final nullableString = Watchable<String?>(null);
+      final nullableList = Watchable<List<int>?>(null);
 
       // Should handle null values gracefully
       expect(nullableString.value, isNull);
@@ -3207,21 +3039,21 @@ void main() {
   });
 
   group('Static Method and Singleton Edge Cases', () {
-    test('const watchable canonicalization with complex values', () {
+    test('watchables with same initial value are independent (v6.0.0)', () {
       const list1 = [1, 2, 3];
       const list2 = [1, 2, 3];
-      const w1 = Watchable(list1);
-      const w2 = Watchable(list2);
+      final w1 = Watchable(list1);
+      final w2 = Watchable(list2);
 
-      // Should be canonicalized to same instance
-      expect(identical(w1, w2), isTrue);
+      // In v6.0.0, each Watchable is independent (no canonicalization)
+      expect(identical(w1, w2), isFalse);
 
-      // But should handle value changes independently in notifiers
+      // Each watchable handles value changes independently
       w1.value = [4, 5, 6];
       w2.value = [7, 8, 9];
 
-      // Both should have the last assigned value (shared notifier)
-      expect(w1.value, equals([7, 8, 9]));
+      // Each has its own value
+      expect(w1.value, equals([4, 5, 6]));
       expect(w2.value, equals([7, 8, 9]));
     });
 
@@ -3261,8 +3093,8 @@ void main() {
       expect(notifications1, equals(1));
     });
 
-    test('deep equality handles reasonable depth structures', () {
-      // Test with reasonably nested structures (not extreme depth)
+    test('identity-based equality with nested structures (v6.0.0)', () {
+      // Test with reasonably nested structures
       final nestedMap = {
         'level1': {
           'level2': {
@@ -3277,8 +3109,8 @@ void main() {
       int notifications = 0;
       watchable.notifier.addListener(() => notifications++);
 
-      // Should detect identical nested structures
-      final identicalMap = {
+      // In v6.0.0, new objects always trigger (identity-based equality)
+      final identicalContentMap = {
         'level1': {
           'level2': {
             'level3': {
@@ -3288,10 +3120,14 @@ void main() {
         }
       };
 
-      watchable.value = identicalMap;
-      expect(notifications, equals(0)); // Should detect deep equality
+      watchable.value = identicalContentMap;
+      expect(notifications, equals(1)); // New object triggers notification
 
-      // Should detect differences in nested structures
+      // Same object does not trigger
+      watchable.value = identicalContentMap;
+      expect(notifications, equals(1)); // Same object, no notification
+
+      // Another new object triggers
       final differentMap = {
         'level1': {
           'level2': {
@@ -3303,7 +3139,7 @@ void main() {
       };
 
       watchable.value = differentMap;
-      expect(notifications, equals(1)); // Should detect difference
+      expect(notifications, equals(2)); // New object triggers
     });
   });
 
@@ -3453,37 +3289,37 @@ void main() {
   group('Shorthand Features', () {
     group('Type Aliases', () {
       test('WInt alias works correctly', () {
-        const watchable = WInt(42);
+        final watchable = WInt(42);
         expect(watchable.value, equals(42));
         expect(watchable, isA<Watchable<int>>());
       });
 
       test('WString alias works correctly', () {
-        const watchable = WString('hello');
+        final watchable = WString('hello');
         expect(watchable.value, equals('hello'));
         expect(watchable, isA<Watchable<String>>());
       });
 
       test('WBool alias works correctly', () {
-        const watchable = WBool(true);
+        final watchable = WBool(true);
         expect(watchable.value, equals(true));
         expect(watchable, isA<Watchable<bool>>());
       });
 
       test('WDouble alias works correctly', () {
-        const watchable = WDouble(3.14);
+        final watchable = WDouble(3.14);
         expect(watchable.value, equals(3.14));
         expect(watchable, isA<Watchable<double>>());
       });
 
       test('WList alias works correctly', () {
-        const watchable = WList<int>([10, 20, 30]);
+        final watchable = WList<int>([10, 20, 30]);
         expect(watchable.value, equals([10, 20, 30]));
         expect(watchable, isA<Watchable<List<int>>>());
       });
 
       test('WMap alias works correctly', () {
-        const watchable = WMap<String, int>({'key': 42});
+        final watchable = WMap<String, int>({'key': 42});
         expect(watchable.value, equals({'key': 42}));
         expect(watchable, isA<Watchable<Map<String, int>>>());
       });
@@ -3727,8 +3563,8 @@ void main() {
       });
     });
 
-    group('Advanced Collection Equality', () {
-      test('deeply nested mixed collections', () {
+    group('Identity-Based Equality (v6.0.0)', () {
+      test('new object assignments always trigger notifications', () {
         final source = <String, dynamic>{}.watchable;
         final updates = <Map<String, dynamic>>[];
         source.notifier.addListener(() => updates.add(source.value));
@@ -3752,29 +3588,28 @@ void main() {
 
         source.value = complexMap;
         source.value =
-            Map.from(complexMap); // Identical content, different object
+            Map.from(complexMap); // Different object triggers notification
         source.value = {
           ...complexMap,
           'config': {...complexMap['config'] as Map, 'theme': 'light'}
-        }; // Different content
+        }; // Different object triggers notification
 
-        expect(updates.length, 2); // Only initial and theme change
+        expect(updates.length, 3); // All three are different objects
       });
 
-      test('custom objects with overridden equality', () {
+      test('same object assignment does not trigger notification', () {
         final source = <CustomUser>[].watchable;
         final updates = <List<CustomUser>>[];
         source.notifier.addListener(() => updates.add(source.value));
 
         final user1 = CustomUser(id: 1, name: 'John');
-        final user2 = CustomUser(id: 1, name: 'John'); // Same data
-        final user3 = CustomUser(id: 1, name: 'Jane'); // Different name
+        final list1 = [user1];
 
-        source.value = [user1];
-        source.value = [user2]; // Should not trigger (same equality)
-        source.value = [user3]; // Should trigger (different)
+        source.value = list1;
+        source.value = list1; // Same object, no notification
+        source.value = list1; // Same object, no notification
 
-        expect(updates.length, 2);
+        expect(updates.length, 1); // Only first assignment triggers
       });
     });
 
